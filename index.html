@@ -4,7 +4,1354 @@
   <meta charset="utf-8">
   <title>Bundled Page</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shining Dream - สมุดรายได้งานกดบัตร/กรอกฟอร์ม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/12.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore-compat.js"></script>
+<style>
+    *{ box-sizing:border-box; }
+    body{ margin:0; }
+
+    /* ===== Base tokens (cute default) ===== */
+    .app{
+      --bg:#FFF7EC;
+      --paper:#FFFFFF;
+      --ink:#33271F;
+      --ink-soft:#9C887B;
+      --red:#FF5247; --red-deep:#E03327;
+      --yellow:#FFC53D; --yellow-deep:#EFA200;
+      --green:#56A744; --green-deep:#3C8A2C;
+      --blue:#2E97D6; --blue-deep:#1B74AD;
+      --purple:#7A5BB0;
+      --line:#FBDFC2;
+      --line-soft:#FFF1E0;
+      --ink-border:#473329;
+      --card-radius:20px;
+      --card-shadow:0 5px 0 rgba(71,51,41,.07), 0 16px 30px -18px rgba(71,51,41,.45);
+      --rainbow:linear-gradient(90deg,#FF595E 0 16.66%,#FF924C 16.66% 33.33%,#FFCA3A 33.33% 50%,#7DC93E 50% 66.66%,#2E97D6 66.66% 83.33%,#7A5BB0 83.33% 100%);
+
+      position:relative;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:'Sarabun', sans-serif;
+      min-height:100vh;
+      padding:30px 20px 70px;
+      overflow:hidden;
+    }
+    /* subtle dotted paper pattern */
+    .app::before{
+      content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+      background-image:radial-gradient(circle, rgba(255,170,70,.10) 1.6px, transparent 1.7px);
+      background-size:24px 24px;
+    }
+    .app.clean{
+      --bg:#FFFCF6;
+      --line:#F0E7DA;
+      --line-soft:#FAF4EA;
+      --card-radius:16px;
+      --card-shadow:0 12px 34px -18px rgba(71,51,41,.3);
+    }
+    .app.clean::before{ background-image:radial-gradient(circle, rgba(255,170,70,.05) 1.4px, transparent 1.5px); background-size:30px 30px; }
+
+    .wrap{ max-width:1180px; margin:0 auto; position:relative; z-index:2; }
+
+    /* ===== Decorations ===== */
+    .deco{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+    .deco span{ position:absolute; line-height:1; filter:drop-shadow(0 6px 10px rgba(71,51,41,.12)); }
+    .deco .d-rainbow{ top:-26px; right:-10px; font-size:150px; transform:rotate(8deg); opacity:.9; }
+    .deco .d-cloud1{ top:120px; left:-14px; font-size:84px; opacity:.85; animation:floaty 7s ease-in-out infinite; }
+    .deco .d-cloud2{ bottom:60px; right:30px; font-size:70px; opacity:.7; animation:floaty 9s ease-in-out infinite .8s; }
+    .deco .d-s1{ top:90px;  left:44%; font-size:30px; animation:twinkle 3.2s ease-in-out infinite; }
+    .deco .d-s2{ top:240px; right:42%; font-size:22px; animation:twinkle 2.6s ease-in-out infinite .6s; }
+    .deco .d-s3{ top:420px; left:8%;  font-size:26px; animation:twinkle 3.6s ease-in-out infinite 1.1s; }
+    .deco .d-s4{ bottom:130px; left:46%; font-size:20px; animation:twinkle 3s ease-in-out infinite .3s; }
+    .app.clean .deco span{ opacity:.18 !important; filter:none; animation:none !important; }
+    .app.clean .deco .d-rainbow{ opacity:.32 !important; }
+    .app.clean .deco .d-s1,.app.clean .deco .d-s2,.app.clean .deco .d-s3,.app.clean .deco .d-s4{ display:none; }
+    @keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
+    @keyframes twinkle{ 0%,100%{ transform:scale(.8) rotate(-6deg); opacity:.5; } 50%{ transform:scale(1.15) rotate(6deg); opacity:1; } }
+
+    /* ===== Header ===== */
+    .topbar{ display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:24px; }
+    .brand-eyebrow{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; letter-spacing:.06em; color:var(--red-deep); font-family:'Mali',sans-serif; font-weight:600; margin:0 0 6px; }
+    .brand-title{ font-family:'Mali',sans-serif; font-weight:700; font-size:30px; margin:0; color:var(--ink); line-height:1.15; }
+    .brand-title .em{ color:var(--red); }
+    .brand-sub{ font-size:13.5px; color:var(--ink-soft); margin:6px 0 0; }
+    .head-right{ display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+    .theme-switch{ display:inline-flex; background:var(--paper); border:2px solid var(--line); border-radius:999px; padding:4px; gap:4px; box-shadow:var(--card-shadow); }
+    .theme-switch button{ font-family:'Mali',sans-serif; font-weight:600; font-size:13px; border:none; background:none; color:var(--ink-soft); padding:7px 15px; border-radius:999px; cursor:pointer; transition:.15s; }
+    .theme-switch button.active{ background:var(--red); color:#fff; box-shadow:0 3px 0 var(--red-deep); }
+    .app.clean .theme-switch button.active{ box-shadow:none; }
+    .reset-link{ font-size:12.5px; color:var(--ink-soft); background:none; border:none; cursor:pointer; text-decoration:underline; padding:2px 4px; font-family:'Sarabun',sans-serif; }
+    .reset-link:hover{ color:var(--red); }
+
+    /* ===== Hero ticket ===== */
+    .ticket-hero{
+      position:relative; display:flex; overflow:hidden; margin-bottom:24px;
+      background:var(--paper);
+      border:2.5px solid var(--ink-border);
+      border-radius:24px;
+      box-shadow:0 8px 0 rgba(71,51,41,.14), 0 26px 40px -22px rgba(71,51,41,.5);
+    }
+    .app.clean .ticket-hero{ border:1.5px solid var(--line); box-shadow:var(--card-shadow); }
+    .rainbow-bar{ position:absolute; top:0; left:0; right:0; height:11px; background:var(--rainbow); z-index:3; }
+    .ticket-main{ flex:1 1 auto; padding:34px 30px 26px; position:relative; }
+    .ticket-main .label{ display:inline-flex; align-items:center; gap:7px; font-size:13px; color:var(--red-deep); margin:0 0 10px; font-family:'Mali',sans-serif; font-weight:600; }
+    .ticket-main .label::before{ content:'🎟️'; font-size:16px; }
+    .ticket-amount{ font-family:'Fredoka',sans-serif; font-weight:700; font-size:58px; line-height:1; margin:0; color:var(--red); letter-spacing:-.5px; }
+    .ticket-amount .cur{ font-family:'Mali',sans-serif; font-size:30px; vertical-align:6px; margin-right:6px; color:var(--yellow-deep); }
+    .ticket-period{ font-size:13px; color:var(--ink-soft); margin-top:12px; font-family:'Mali',sans-serif; font-weight:500; }
+    .hero-deco{ position:absolute; top:18px; right:22px; font-size:40px; line-height:1; }
+    .app.clean .hero-deco{ opacity:.5; }
+    .ticket-stub{
+      flex:0 0 240px; padding:30px 24px 24px; display:flex; flex-direction:column; gap:15px; justify-content:center; position:relative;
+      background:linear-gradient(160deg, #FFF6E6, #FFEFD3);
+      border-left:3px dashed var(--ink-border);
+    }
+    .app.clean .ticket-stub{ background:var(--line-soft); border-left:2px dashed var(--line); }
+    .ticket-hero::before, .ticket-hero::after{ content:''; position:absolute; width:26px; height:26px; border-radius:50%; background:var(--bg); right:226px; z-index:4; }
+    .ticket-hero::before{ top:-15px; }
+    .ticket-hero::after{ bottom:-15px; }
+    .stub-row{ display:flex; justify-content:space-between; align-items:baseline; font-size:13px; }
+    .stub-row span{ color:var(--ink-soft); font-family:'Mali',sans-serif; }
+    .stub-row b{ font-family:'Fredoka',sans-serif; font-size:22px; color:var(--red-deep); }
+    .ticket-num{ position:absolute; bottom:9px; right:16px; font-size:10.5px; letter-spacing:.06em; color:var(--yellow-deep); font-family:'Mali',sans-serif; font-weight:600; }
+
+    @media (max-width:680px){
+      .ticket-hero{ flex-direction:column; }
+      .ticket-stub{ border-left:none; border-top:3px dashed var(--ink-border); flex-basis:auto; }
+      .ticket-hero::before,.ticket-hero::after{ display:none; }
+      .ticket-amount{ font-size:46px; }
+    }
+    .cal-date-right{ display:flex; align-items:center; gap:4px; }
+    .client-row{ flex-wrap:wrap; }
+    /* weekly strip */
+    .week-strip{ display:flex; align-items:center; flex-wrap:wrap; gap:9px 14px; background:linear-gradient(120deg,#FFFDF8,#FFF3DE); border:2px solid var(--line); border-radius:16px; padding:13px 18px; margin-bottom:22px; box-shadow:var(--card-shadow); }
+    .week-strip .ws-label{ display:inline-flex; align-items:center; gap:6px; font-family:'Mali',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink); }
+    .week-strip .ws-total{ font-family:'Fredoka',sans-serif; font-weight:700; font-size:25px; color:var(--red-deep); }
+    .week-strip .ws-break{ display:flex; gap:7px; flex-wrap:wrap; }
+    .ws-pill{ font-family:'Mali',sans-serif; font-size:11.5px; font-weight:600; color:var(--ink-soft); background:#fff; border:1.5px solid var(--line); border-radius:999px; padding:4px 11px; }
+    .ws-pill b{ font-weight:700; margin-left:3px; }
+    .ws-pill.ouy b{ color:var(--red-deep); }
+    .ws-pill.yo b{ color:var(--blue-deep); }
+    .ws-pill.tong b{ color:var(--yellow-deep); }
+    .ws-pill.aoo b{ color:var(--purple); }
+    .ws-range{ margin-left:auto; font-family:'Mali',sans-serif; font-size:11.5px; color:var(--ink-soft); }
+    @media (max-width:680px){ .ws-range{ margin-left:0; } }
+    /* calendar add button */
+    .cal-add{ flex:0 0 auto; width:19px; height:19px; border-radius:7px; border:1.5px solid var(--line); background:#FFF6E8; color:var(--red-deep); font-family:'Mali',sans-serif; font-weight:700; font-size:14px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; opacity:.5; transition:.12s; }
+    .cal-cell:hover .cal-add{ opacity:1; }
+    .cal-add:hover{ background:var(--yellow); color:#fff; border-color:var(--yellow); opacity:1; }
+    /* client confirm */
+    .cl-confirm{ font-family:'Mali',sans-serif; font-weight:700; font-size:10.5px; border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); border-radius:999px; padding:4px 10px; cursor:pointer; white-space:nowrap; transition:.12s; }
+    .cl-confirm:hover{ border-color:var(--green); }
+    .cl-confirm.on{ background:#DEF3D9; border-color:var(--green); color:var(--green-deep); }
+    .confirm-toggle{ width:100%; font-family:'Mali',sans-serif; font-weight:700; font-size:13.5px; border:2px dashed var(--line); background:#fff; color:var(--ink-soft); border-radius:13px; padding:11px; cursor:pointer; transition:.12s; }
+    .confirm-toggle.on{ background:#DEF3D9; border-style:solid; border-color:var(--green); color:var(--green-deep); }
+    /* live presence */
+    .live-badge{ display:inline-flex; align-items:center; gap:7px; font-family:'Mali',sans-serif; font-weight:600; font-size:12px; color:var(--green-deep); background:#EAF7E5; border:1.5px solid #CFEAC4; border-radius:999px; padding:5px 13px; }
+    .live-dot{ width:9px; height:9px; border-radius:50%; background:#3FBF4F; box-shadow:0 0 0 0 rgba(63,191,79,.6); animation:livepulse 1.8s ease-out infinite; }
+    @keyframes livepulse{ 0%{ box-shadow:0 0 0 0 rgba(63,191,79,.55); } 70%{ box-shadow:0 0 0 8px rgba(63,191,79,0); } 100%{ box-shadow:0 0 0 0 rgba(63,191,79,0); } }
+
+    /* ===== Calendar ===== */
+    .card{ background:var(--paper); border:2px solid var(--line); border-radius:var(--card-radius); box-shadow:var(--card-shadow); }
+    .calendar-card{ background:var(--paper); border:2px solid var(--line); border-radius:var(--card-radius); box-shadow:var(--card-shadow); padding:20px 20px 18px; margin-bottom:22px; }
+    .cal-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .cal-nav{ display:flex; gap:7px; }
+    .cal-title{ font-family:'Mali',sans-serif; font-weight:700; font-size:18px; flex:1 1 auto; text-align:center; color:var(--ink); }
+    .cal-legend{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; font-size:11.5px; color:var(--ink-soft); font-family:'Mali',sans-serif; }
+    .cal-legend span{ display:inline-flex; align-items:center; gap:5px; }
+    .cal-legend .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+    .cal-legend .dot.bid{ background:var(--red); }
+    .cal-legend .dot.form{ background:var(--blue); }
+    .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:7px; }
+    .cal-dow{ text-align:center; font-size:11.5px; color:var(--ink-soft); font-weight:600; padding-bottom:5px; font-family:'Mali',sans-serif; }
+    .cal-cell{ min-height:98px; border:1.5px solid var(--line-soft); border-radius:13px; padding:7px 7px 6px; cursor:pointer; background:#FFFDFA; display:flex; flex-direction:column; gap:3px; transition:.12s; }
+    .cal-cell.empty{ background:transparent; border:none; cursor:default; }
+    .cal-cell:not(.empty):hover{ border-color:var(--yellow); transform:translateY(-2px); }
+    .cal-cell:focus-visible{ outline:2.5px solid var(--yellow); outline-offset:1px; }
+    .cal-cell.today{ border-color:var(--blue); background:#EAF6FD; }
+    .cal-cell.today .cal-date{ color:var(--blue-deep); }
+    .cal-cell.selected{ border-color:var(--red); background:#FFF0E9; box-shadow:0 0 0 3px rgba(255,82,71,.14); }
+    .cal-cell.sunday{ border-top:3px solid #7A5BB0; }
+    .cal-date-row{ display:flex; align-items:center; justify-content:space-between; gap:4px; }
+    .cal-date{ font-size:12.5px; font-weight:700; color:var(--ink); font-family:'Mali',sans-serif; }
+    .cal-sun-tag{ font-size:9px; font-weight:700; color:#6A4C93; letter-spacing:.02em; white-space:nowrap; font-family:'Mali',sans-serif; }
+    .cal-jobs{ display:flex; flex-direction:column; gap:3px; }
+    .cal-job-pill{ font-size:10.5px; line-height:1.3; padding:2.5px 7px; border-radius:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; cursor:pointer; font-family:'Mali',sans-serif; }
+    .cal-job-pill:hover{ filter:brightness(0.95); }
+    .cal-job-pill:focus-visible{ outline:2px solid var(--yellow); outline-offset:1px; }
+    .cal-job-pill.bid{ background:#FFE6D2; color:var(--red-deep); }
+    .cal-job-pill.form{ background:#E1F1FB; color:var(--blue-deep); }
+    .cal-job-more{ font-size:9.5px; color:var(--ink-soft); font-weight:600; }
+    .cal-avg-tag{ font-size:12px; font-weight:700; color:var(--yellow-deep); font-family:'Mali',sans-serif; margin-top:auto; }
+    .cal-settle{ margin-top:6px; padding:6px 7px; border-radius:9px; background:#F1ECFA; border:1px solid #DDD0F0; display:flex; flex-direction:column; gap:4px; }
+    .cal-settle-amt{ font-size:9.5px; color:#5B4794; line-height:1.35; font-weight:600; font-family:'Mali',sans-serif; }
+    .cal-settle-btn{ font-size:10px; font-weight:700; border:none; border-radius:999px; padding:3px 10px; cursor:pointer; align-self:flex-start; font-family:'Mali',sans-serif; }
+    .cal-settle-btn.pending{ background:#E3D7F5; color:#5B4794; }
+    .cal-settle-btn.settled{ background:#DEF3D9; color:var(--green-deep); }
+    .cal-foot{ display:flex; justify-content:center; margin-top:12px; }
+    @media (max-width:680px){
+      .cal-cell{ min-height:80px; padding:5px; }
+      .cal-job-pill{ font-size:9.5px; padding:2px 5px; }
+      .cal-avg-tag{ font-size:10.5px; }
+      .cal-settle-amt{ font-size:8.5px; }
+      .cal-dow{ font-size:10px; }
+    }
+
+    /* ===== Chips ===== */
+    .chips{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:22px; }
+    @media (max-width:760px){ .chips{ grid-template-columns:repeat(2,1fr); } }
+    .chip{ position:relative; background:var(--paper); border:2px solid var(--line); border-radius:16px; padding:14px 15px 15px; overflow:hidden; box-shadow:var(--card-shadow); }
+    .chip::after{ content:''; position:absolute; top:0; left:0; right:0; height:5px; }
+    .chip.c-red::after{ background:var(--red); }
+    .chip.c-blue::after{ background:var(--blue); }
+    .chip.c-yellow::after{ background:var(--yellow); }
+    .chip.c-purple::after{ background:var(--purple); }
+    .chip .t{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--ink-soft); font-family:'Mali',sans-serif; font-weight:600; margin:4px 0 6px; }
+    .chip .v{ font-family:'Mali',sans-serif; font-weight:700; font-size:22px; }
+    .chip.c-red .v{ color:var(--red-deep); }
+    .chip.c-blue .v{ color:var(--blue-deep); }
+    .chip.c-yellow .v{ color:var(--yellow-deep); }
+    .chip.c-purple .v{ color:var(--purple); }
+
+    /* ===== Toolbar ===== */
+    .toolbar{ display:flex; flex-wrap:wrap; gap:11px; align-items:center; background:var(--paper); border:2px solid var(--line); border-radius:var(--card-radius); padding:15px 16px; margin-bottom:20px; box-shadow:var(--card-shadow); }
+    .field-mini label{ display:block; font-size:11px; color:var(--ink-soft); margin-bottom:4px; font-family:'Mali',sans-serif; font-weight:600; }
+    select, input, textarea{ font-family:'Sarabun',sans-serif; font-size:13.5px; color:var(--ink); background:#fff; border:2px solid var(--line); border-radius:11px; padding:8px 11px; outline:none; transition:.14s; }
+    select:focus, input:focus, textarea:focus{ border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,197,61,.25); }
+    .toolbar select, .toolbar input{ min-width:132px; }
+    .search-mini{ flex:1 1 160px; }
+    .search-mini input{ width:100%; min-width:0; }
+    .spacer{ flex:1 1 auto; }
+    .btn{ font-family:'Mali',sans-serif; font-weight:600; font-size:13.5px; border:none; border-radius:var(--btn-radius,13px); padding:10px 17px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:transform .08s ease, box-shadow .15s ease, background .15s ease; }
+    .btn-primary{ background:var(--red); color:#fff; box-shadow:0 4px 0 var(--red-deep); }
+    .btn-primary:hover{ background:#FF6359; }
+    .btn-primary:active{ transform:translateY(3px); box-shadow:0 1px 0 var(--red-deep); }
+    .app.clean .btn-primary{ box-shadow:0 6px 16px -6px rgba(255,82,71,.7); }
+    .app.clean .btn-primary:active{ transform:translateY(1px); }
+    .btn-ghost{ background:#fff; color:var(--ink); border:2px solid var(--line); box-shadow:0 4px 0 rgba(71,51,41,.06); }
+    .btn-ghost:hover{ border-color:var(--yellow); }
+    .btn-ghost:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(71,51,41,.06); }
+    .app.clean .btn-ghost{ box-shadow:none; }
+    .btn-sm{ padding:7px 13px; font-size:12.5px; }
+    .btn-danger{ background:var(--red); color:#fff; box-shadow:0 4px 0 var(--red-deep); }
+
+    /* ===== Table ===== */
+    .table-card{ background:var(--paper); border:2px solid var(--line); border-radius:var(--card-radius); box-shadow:var(--card-shadow); overflow:hidden; }
+    .table-scroll{ overflow-x:auto; }
+    table{ width:100%; border-collapse:collapse; min-width:920px; }
+    thead th{ text-align:left; font-size:11.5px; color:var(--ink-soft); letter-spacing:.02em; font-family:'Mali',sans-serif; font-weight:600; padding:13px 12px; border-bottom:2px solid var(--line); white-space:nowrap; background:linear-gradient(180deg,#FFF3E2,#FFEAD0); }
+    tbody tr.job-row{ cursor:pointer; border-bottom:1.5px solid var(--line-soft); }
+    tbody tr.job-row:hover{ background:#FFF6EA; }
+    tbody tr.job-row td{ padding:12px; font-size:13.5px; vertical-align:middle; }
+    .ev-name{ font-weight:600; font-family:'Mali',sans-serif; }
+    .ev-site{ font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+    .date-main{ font-weight:700; font-family:'Mali',sans-serif; }
+    .date-sub{ font-size:11.5px; color:var(--ink-soft); }
+    .badge{ display:inline-block; padding:3.5px 11px; border-radius:999px; font-size:11.5px; font-weight:700; white-space:nowrap; font-family:'Mali',sans-serif; }
+    .badge-bid{ background:#FFE2CC; color:var(--red-deep); }
+    .badge-form{ background:#DFF0FB; color:var(--blue-deep); }
+    .badge-y{ background:#DCF1D6; color:var(--green-deep); }
+    .badge-c{ background:#E6EBFA; color:#4257B5; }
+    .badge-n{ background:#FFDDD9; color:var(--red-deep); }
+    .amt{ font-family:'Mali',sans-serif; font-weight:700; }
+    .amt-strong{ color:var(--red-deep); }
+    .actions{ display:flex; gap:6px; }
+    .icon-btn{ border:2px solid var(--line); background:#fff; border-radius:10px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.12s; }
+    .icon-btn:hover{ border-color:var(--yellow); background:#FFFBF0; }
+    .detail-row td{ background:#FFF9EF; padding:15px 18px; border-bottom:1.5px solid var(--line-soft); }
+    .detail-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px 18px; }
+    .detail-grid .d{ font-size:12px; color:var(--ink-soft); }
+    .detail-grid .d b{ display:block; font-size:14px; color:var(--ink); font-family:'Mali',sans-serif; font-weight:700; margin-top:2px; }
+    .empty-state{ padding:54px 20px; text-align:center; color:var(--ink-soft); }
+    .empty-state .big{ font-family:'Mali',sans-serif; font-size:18px; color:var(--ink); margin-bottom:6px; }
+    .empty-state .ico{ font-size:40px; margin-bottom:10px; }
+
+    /* ===== Modal ===== */
+    .overlay{ position:fixed; inset:0; background:rgba(51,39,31,0.5); display:none; align-items:center; justify-content:center; padding:18px; z-index:50; backdrop-filter:blur(2px); }
+    .overlay.show{ display:flex; }
+    .modal{ background:var(--paper); border:2.5px solid var(--ink-border); border-radius:22px; max-width:560px; width:100%; max-height:88vh; overflow-y:auto; box-shadow:0 24px 60px -12px rgba(0,0,0,0.4); }
+    .app.clean .modal{ border:1.5px solid var(--line); }
+    .modal-head{ padding:18px 22px; border-bottom:2px solid var(--line); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--paper); border-radius:20px 20px 0 0; }
+    .modal-head h3{ font-family:'Mali',sans-serif; font-weight:700; font-size:19px; margin:0; display:flex; align-items:center; gap:8px; }
+    .modal-head h3::before{ content:'🎟️'; }
+    .modal-close{ background:none; border:none; font-size:20px; cursor:pointer; color:var(--ink-soft); line-height:1; }
+    .modal-body{ padding:20px 22px; }
+    .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+    .form-grid .full{ grid-column:1/-1; }
+    .form-field label{ display:block; font-size:12px; font-family:'Mali',sans-serif; font-weight:600; color:var(--ink-soft); margin-bottom:5px; }
+    .form-field input, .form-field select{ width:100%; }
+    .form-field textarea{ width:100%; resize:vertical; min-height:130px; line-height:1.5; }
+    .num-stepper{ display:flex; align-items:stretch; }
+    .num-stepper input{ flex:1 1 auto; min-width:0; text-align:center; border-radius:0; border-left:none; border-right:none; -moz-appearance:textfield; }
+    .num-stepper input::-webkit-outer-spin-button, .num-stepper input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+    .step-btn{ flex:0 0 42px; border:2px solid var(--line); background:#FFF6E8; color:var(--red-deep); font-family:'Mali',sans-serif; font-weight:700; font-size:21px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.12s; user-select:none; }
+    .step-btn:first-child{ border-radius:11px 0 0 11px; }
+    .step-btn:last-child{ border-radius:0 11px 11px 0; }
+    .step-btn:hover{ background:var(--yellow); color:#fff; border-color:var(--yellow); }
+    .step-btn:active{ transform:translateY(1px); }
+    .type-toggle{ display:flex; gap:9px; }
+    .type-opt{ flex:1; text-align:center; padding:11px 10px; border:2px solid var(--line); border-radius:13px; cursor:pointer; font-size:13.5px; font-family:'Mali',sans-serif; font-weight:600; color:var(--ink-soft); transition:.14s; }
+    .type-opt.active-bid{ border-color:var(--red); background:#FFF0E9; color:var(--red-deep); box-shadow:0 3px 0 rgba(255,82,71,.25); }
+    .type-opt.active-form{ border-color:var(--blue); background:#EAF6FD; color:var(--blue-deep); box-shadow:0 3px 0 rgba(46,151,214,.25); }
+    .preview-box{ margin-top:18px; background:linear-gradient(155deg,#FFF3D6,#FFE7BD); border:2px solid var(--yellow); border-radius:16px; padding:16px 18px; }
+    .preview-box .pr-title{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--yellow-deep); margin-bottom:11px; font-family:'Mali',sans-serif; font-weight:700; }
+    .preview-box .pr-title::before{ content:'✨'; }
+    .preview-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:11px; }
+    .preview-grid div{ font-size:11.5px; color:var(--ink-soft); font-family:'Mali',sans-serif; }
+    .preview-grid div b{ display:block; font-family:'Mali',sans-serif; font-weight:700; font-size:17px; color:var(--red-deep); margin-top:2px; }
+    .modal-foot{ padding:16px 22px; border-top:2px solid var(--line); display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; position:sticky; bottom:0; background:var(--paper); }
+    .hidden{ display:none !important; }
+
+    /* clients */
+    .badge-x{ background:#EBE4F4; color:#5B4794; }
+    .badge-line{ background:#DBF3E2; color:#06924B; }
+    .clients-list{ display:flex; flex-direction:column; gap:8px; }
+    .clients-empty{ font-size:12.5px; color:var(--ink-soft); padding:8px 2px; font-family:'Mali',sans-serif; }
+    .client-row{ display:flex; align-items:center; gap:8px; border:2px solid var(--line); border-radius:12px; padding:9px 11px; background:#fff; }
+    .client-row .cl-name{ font-weight:600; font-size:13.5px; flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:'Mali',sans-serif; }
+    .client-row .cl-note-flag{ font-size:11px; color:var(--ink-soft); white-space:nowrap; }
+    .client-detail-list{ margin-top:8px; display:flex; flex-direction:column; gap:6px; }
+
+    .confirm-box{ max-width:390px; padding:24px; text-align:center; border-radius:22px; }
+    .confirm-box .big{ font-family:'Mali',sans-serif; font-weight:700; }
+    .confirm-box p{ font-size:14px; color:var(--ink-soft); margin:8px 0 18px; }
+
+    .toast{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--ink); color:#FFF7EC; padding:12px 20px; border-radius:999px; font-size:13.5px; font-family:'Mali',sans-serif; font-weight:600; box-shadow:0 12px 30px -8px rgba(0,0,0,.4); z-index:80; opacity:0; transition:all .25s ease; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app cute">
+  <div class="deco" aria-hidden="true">
+    <span class="d-rainbow">🌈</span>
+    <span class="d-cloud1">☁️</span>
+    <span class="d-cloud2">☁️</span>
+    <span class="d-s1">✨</span>
+    <span class="d-s2">⭐</span>
+    <span class="d-s3">✨</span>
+    <span class="d-s4">⭐</span>
+  </div>
+
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <p class="brand-eyebrow">🌈 Shining Dream · บัญชีงาน</p>
+        <h1 class="brand-title">สมุดรายได้ <span class="em">งานกดบัตร / กรอกฟอร์ม</span> ✨</h1>
+        <p class="brand-sub">บันทึกงาน คำนวณรายได้ให้อัตโนมัติ ไม่ต้องพึ่งสูตรในชีตอีกต่อไป</p>
+      </div>
+      <div class="head-right">
+        <div class="live-badge"><span class="live-dot"></span><span id="liveCount">1</span> คนกำลังดูอยู่</div>
+        <button class="reset-link" id="resetBtn">ล้างข้อมูลทั้งหมด</button>
+      </div>
+    </div>
+
+    <div class="ticket-hero">
+      <div class="rainbow-bar"></div>
+      <div class="ticket-main">
+        <p class="label">รายได้รวม<span id="periodLabelInline"></span></p>
+        <p class="ticket-amount"><span class="cur">฿</span><span id="heroTotal">0</span></p>
+        <p class="ticket-period" id="heroPeriod">แสดงข้อมูลทั้งหมด</p>
+        <span class="hero-deco">☁️</span>
+      </div>
+      <div class="ticket-stub">
+        <div class="stub-row"><span>งานทั้งหมด</span><b id="stCount">0</b></div>
+        <div class="stub-row"><span>ได้แล้ว</span><b id="stDone">0</b></div>
+        <div class="stub-row"><span>รอผล (coming)</span><b id="stComing">0</b></div>
+        <div class="ticket-num">NO. <span id="ticketNo">0001</span></div>
+      </div>
+    </div>
+
+    <div class="week-strip" id="weekStrip">
+      <div class="ws-label">📅 รายได้รวมสัปดาห์นี้</div>
+      <div class="ws-total" id="wsTotal">฿0</div>
+      <div class="ws-break">
+        <span class="ws-pill ouy">ออย<b id="wsOuy">฿0</b></span>
+        <span class="ws-pill yo">โย<b id="wsYo">฿0</b></span>
+        <span class="ws-pill tong">ตอง<b id="wsTong">฿0</b></span>
+        <span class="ws-pill aoo">เอิงเอย<b id="wsAo">฿0</b></span>
+      </div>
+      <div class="ws-range" id="wsRange"></div>
+    </div>
+
+    <div class="calendar-card">
+      <div class="cal-head">
+        <div class="cal-nav">
+          <button class="icon-btn" id="calPrev" title="เดือนก่อนหน้า">‹</button>
+          <button class="icon-btn" id="calNext" title="เดือนถัดไป">›</button>
+        </div>
+        <div class="cal-title" id="calTitle">-</div>
+        <button class="btn btn-ghost btn-sm" id="calToday">วันนี้</button>
+      </div>
+      <div class="cal-legend">
+        <span><span class="dot bid"></span>กดบัตร</span>
+        <span><span class="dot form"></span>กรอกฟอร์ม</span>
+        <span>🧾 วันอาทิตย์ = วันเคลียร์ยอด</span>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-foot">
+        <button class="btn btn-ghost btn-sm hidden" id="calClear">✕ ล้างวันที่ที่เลือก</button>
+      </div>
+    </div>
+
+    <div class="chips">
+      <div class="chip c-red"><div class="t">🎟️ รายได้งานกดบัตร</div><div class="v" id="chipBid">฿0</div></div>
+      <div class="chip c-blue"><div class="t">📝 รายได้งานกรอกฟอร์ม</div><div class="v" id="chipForm">฿0</div></div>
+      <div class="chip c-yellow"><div class="t">🌈 รายได้ออย + โย</div><div class="v" id="chipOuyYo">฿0</div></div>
+      <div class="chip c-purple"><div class="t">✨ commission สะสม</div><div class="v" id="chipComm">฿0</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="field-mini">
+        <label>เดือน</label>
+        <select id="filterMonth"><option value="">ทั้งหมด</option></select>
+      </div>
+      <div class="field-mini">
+        <label>ประเภทงาน</label>
+        <select id="filterType">
+          <option value="">ทั้งหมด</option>
+          <option value="กดบัตร">กดบัตร</option>
+          <option value="กรอกฟอร์ม">กรอกฟอร์ม</option>
+        </select>
+      </div>
+      <div class="field-mini">
+        <label>ผลลัพธ์</label>
+        <select id="filterResult">
+          <option value="">ทั้งหมด</option>
+          <option value="ได้">ได้</option>
+          <option value="coming">coming</option>
+          <option value="ไม่ได้">ไม่ได้</option>
+        </select>
+      </div>
+      <div class="field-mini search-mini">
+        <label>ค้นหาชื่องาน</label>
+        <input type="text" id="searchBox" placeholder="พิมพ์ชื่องาน...">
+      </div>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" id="exportBtn">⬇ ส่งออก CSV</button>
+      <button class="btn btn-primary" id="addBtn">+ เพิ่มงานใหม่</button>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table id="jobTable">
+          <thead>
+            <tr>
+              <th>วันที่</th>
+              <th>event</th>
+              <th>ประเภท</th>
+              <th>ผลลัพธ์</th>
+              <th>ใบที่ได้</th>
+              <th>รายได้ทั้งหมด</th>
+              <th>รวม ออ+ตอง</th>
+              <th>เฉลี่ย ออ+ตอง</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state hidden" id="emptyState">
+        <div class="ico">🌥️</div>
+        <div class="big">ยังไม่มีข้อมูลงาน</div>
+        <div>กดปุ่ม "เพิ่มงานใหม่" เพื่อเริ่มบันทึกงานแรกของคุณ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="formOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="formTitle">เพิ่มงานใหม่</h3>
+        <button class="modal-close" id="formCloseBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field full">
+            <label>ประเภทงาน</label>
+            <div class="type-toggle">
+              <div class="type-opt" id="typeOptBid" data-type="กดบัตร">กดบัตร</div>
+              <div class="type-opt" id="typeOptForm" data-type="กรอกฟอร์ม">กรอกฟอร์ม</div>
+            </div>
+          </div>
+          <div class="form-field"><label>วันที่</label><input type="date" id="f_date"></div>
+          <div class="form-field"><label>เวลา</label><input type="text" id="f_time" placeholder="เช่น 12:00 หรือ 9:00 (รับคิว)"></div>
+          <div class="form-field full"><label>ชื่องาน (event)</label><input type="text" id="f_event" list="eventList" placeholder="ชื่องาน/ศิลปิน"></div>
+          <datalist id="eventList"></datalist>
+          <div class="form-field" id="websiteField"><label>website</label><input type="text" id="f_website" list="websiteList" placeholder="เลือกหรือพิมพ์เอง"></div>
+          <datalist id="websiteList">
+            <option value="Thaiticketmajor"></option><option value="Allticket"></option><option value="Ticketmelon"></option>
+            <option value="Eventpop"></option><option value="PB"></option><option value="ETC"></option>
+          </datalist>
+          <div class="form-field" id="customersNumField"><label>จำนวนลูกค้า</label><div class="num-stepper"><button type="button" class="step-btn" data-step="-1" data-target="f_customers">−</button><input type="number" id="f_customers" min="0" step="1" value="1"><button type="button" class="step-btn" data-step="1" data-target="f_customers">+</button></div></div>
+          <div class="form-field full hidden" id="clientsField">
+            <label>รายชื่อลูกค้า <span id="clientsCountLabel" style="font-weight:400;color:var(--ink-soft);"></span></label>
+            <div class="clients-list" id="clientsList"></div>
+            <button type="button" class="btn btn-ghost btn-sm" id="addClientBtn" style="margin-top:8px;">+ เพิ่มลูกค้า</button>
+          </div>
+          <div class="form-field"><label>ผลลัพธ์</label>
+            <select id="f_result">
+              <option value="coming">coming</option>
+              <option value="ได้">ได้</option>
+              <option value="ไม่ได้">ไม่ได้</option>
+            </select>
+          </div>
+          <div class="form-field"><label>จำนวนใบที่ได้ (All)</label><div class="num-stepper"><button type="button" class="step-btn" data-step="-1" data-target="f_tickets">−</button><input type="number" id="f_tickets" min="0" step="1" value="0"><button type="button" class="step-btn" data-step="1" data-target="f_tickets">+</button></div></div>
+          <div class="form-field" id="ouyField"><label>ออย (ใบ)</label><div class="num-stepper"><button type="button" class="step-btn" data-step="-1" data-target="f_ouy">−</button><input type="number" id="f_ouy" min="0" step="1" value="0"><button type="button" class="step-btn" data-step="1" data-target="f_ouy">+</button></div></div>
+          <div class="form-field" id="yoField"><label>โย (ใบ)</label><div class="num-stepper"><button type="button" class="step-btn" data-step="-1" data-target="f_yo">−</button><input type="number" id="f_yo" min="0" step="1" value="0"><button type="button" class="step-btn" data-step="1" data-target="f_yo">+</button></div></div>
+          <div class="form-field" id="outongField"><label>ออ+ตองรวม (ใบ)</label><div class="num-stepper"><button type="button" class="step-btn" data-step="-1" data-target="f_outong">−</button><input type="number" id="f_outong" min="0" step="1" value="0"><button type="button" class="step-btn" data-step="1" data-target="f_outong">+</button></div></div>
+          <div class="form-field"><label>ยกเลิก (ยอดรวม)</label><input type="number" id="f_cancel" min="0" step="1" value="0"></div>
+          <div class="form-field"><label>tip (ยอดรวม)</label><input type="number" id="f_tip" min="0" step="1" value="0"></div>
+        </div>
+
+        <div class="preview-box">
+          <div class="pr-title">คำนวณอัตโนมัติ</div>
+          <div class="preview-grid">
+            <div>รายได้ทั้งหมด<b id="pv_total">฿0</b></div>
+            <div>commission<b id="pv_comm">฿0</b></div>
+            <div>รวม ออ+ตอง<b id="pv_outong">฿0</b></div>
+            <div>รายได้ออย<b id="pv_ouy">฿0</b></div>
+            <div>รายได้โย<b id="pv_yo">฿0</b></div>
+            <div>เฉลี่ย ออ+ตอง<b id="pv_avg">฿0</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="formCancelBtn">ยกเลิก</button>
+        <button class="btn btn-primary" id="formSaveBtn">บันทึกงาน</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="confirmOverlay">
+    <div class="modal confirm-box">
+      <div class="big" style="font-family:'Mali',sans-serif;font-size:18px;margin-bottom:4px;" id="confirmTitle">ยืนยันการลบ</div>
+      <p id="confirmMsg">ต้องการลบงานนี้หรือไม่ การลบไม่สามารถย้อนกลับได้</p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="btn btn-ghost" id="confirmCancelBtn">ยกเลิก</button>
+        <button class="btn btn-danger" id="confirmOkBtn">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="clientOverlay">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-head">
+        <h3 id="clientFormTitle">เพิ่มลูกค้า</h3>
+        <button class="modal-close" id="clientCloseBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field full"><label>ชื่อลูกค้า</label><input type="text" id="c_name" placeholder="ชื่อ / ชื่อเล่น / ไอดี"></div>
+          <div class="form-field full"><label>แหล่งที่มา</label>
+            <select id="c_source">
+              <option value="X">X</option>
+              <option value="Line OA">Line OA</option>
+            </select>
+          </div>
+          <div class="form-field full">
+            <label>ข้อความ confirmation (ส่งให้ลูกค้าคนนี้)</label>
+            <textarea id="c_note" rows="8" placeholder="พิมพ์ข้อความยืนยันสำหรับลูกค้าคนนี้..."></textarea>
+          </div>
+          <div class="form-field full">
+            <button type="button" class="confirm-toggle" id="c_confirmBtn">⬜ จิ้มเมื่อคอนเฟิร์มเรียบร้อย พร้อมส่งต่อ</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="clientDeleteBtn" style="margin-right:auto;color:var(--red-deep);">ลบลูกค้านี้</button>
+        <button class="btn btn-ghost" id="clientCopyBtn">📋 คัดลอก confirmation</button>
+        <button class="btn btn-ghost" id="clientCancelBtn">ยกเลิก</button>
+        <button class="btn btn-primary" id="clientSaveBtn">บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+    let jobs = [];
+    let editingId = null;
+    let pendingDeleteId = null;
+    let pendingReset = false;
+    let calMonth = isoLocal(new Date()).slice(0,7);
+    let selectedDate = null;
+    let editingClients = [];
+    let editingClientId = null;
+    let editingClientConfirmed = false;
+    let settlements = {};
+
+    const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+    const $ = (id) => document.getElementById(id);
+    const num = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+    const baht = (v) => '฿' + Math.round(v).toLocaleString('th-TH');
+    const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+
+    /* ---------- Locked to "จัดเต็ม" (cute) ---------- */
+    const appEl = document.querySelector('.app');
+    appEl.classList.add('cute');
+    appEl.classList.remove('clean');
+
+    function calc(job){
+      const I = num(job.tickets), J = num(job.ouy), K = num(job.yo), L = num(job.outong);
+      const M = num(job.cancel), N = num(job.tip);
+      let total=0, ouyIncome=0, yoIncome=0, commission=0, outongTotal=0;
+      if(job.type === 'กดบัตร'){
+        total = I*300 + M + N;
+        ouyIncome = J*200;
+        yoIncome = K*200;
+        commission = (J+K)*100;
+        outongTotal = L*300 + M + N + commission;
+      } else if(job.type === 'กรอกฟอร์ม'){
+        total = I*150 + M + N;
+        outongTotal = I*150 + M + N;
+      }
+      return { total, ouyIncome, yoIncome, commission, outongTotal, avgOutong: outongTotal/2 };
+    }
+
+    function toThaiDate(iso){
+      if(!iso) return '-';
+      const d = new Date(iso + 'T00:00:00');
+      return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()+543}`;
+    }
+    function monthKey(iso){ return iso ? iso.slice(0,7) : ''; }
+    function monthLabel(key){
+      const [y,m] = key.split('-');
+      return `${THAI_MONTHS[parseInt(m,10)-1]} ${parseInt(y,10)+543}`;
+    }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmieTvA3aeFdcrqxaLdvD2HPROwaDEwxU",
+      authDomain: "shiningdream-workflow.firebaseapp.com",
+      projectId: "shiningdream-workflow",
+      storageBucket: "shiningdream-workflow.firebasestorage.app",
+      messagingSenderId: "1074639463109",
+      appId: "1:1074639463109:web:ab3f9d9cc73855a775c6ac"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    try{ db.enablePersistence({ synchronizeTabs: true }); }catch(e){ /* offline cache unavailable, app still works online */ }
+    const mainDocRef = db.collection('shiningdream').doc('main');
+    const jobsColRef = mainDocRef.collection('jobs');
+
+    function startRealtimeSync(){
+      jobsColRef.onSnapshot(snapshot=>{
+        jobs = snapshot.docs.map(d=> Object.assign({}, d.data(), { id: d.id }));
+        render();
+      }, err=>{
+        showToast('เชื่อมต่อฐานข้อมูลไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต');
+      });
+      mainDocRef.onSnapshot(snap=>{
+        const data = snap.exists ? snap.data() : {};
+        settlements = data.settlements || {};
+        renderCalendar();
+      }, err=>{
+        showToast('เชื่อมต่อสถานะการโอนไม่สำเร็จ');
+      });
+    }
+
+    async function toggleSettlement(iso){
+      settlements[iso] = !settlements[iso];
+      try{
+        await mainDocRef.set({ settlements }, { merge: true });
+        showToast(settlements[iso] ? 'มาร์คว่าโอนแล้ว ✓' : 'ยกเลิกการมาร์คโอนแล้ว');
+      }catch(e){
+        settlements[iso] = !settlements[iso];
+        showToast('บันทึกสถานะการโอนไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต');
+      }
+      renderCalendar();
+    }
+
+    function showToast(msg){
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=> t.classList.remove('show'), 2200);
+    }
+
+    function sundayOfCurrentWeek(){
+      const d = new Date(); d.setHours(0,0,0,0);
+      const add = (7 - d.getDay()) % 7;
+      d.setDate(d.getDate() + add);
+      return isoLocal(d);
+    }
+    function updateWeekStrip(){
+      const sun = sundayOfCurrentWeek();
+      const wk = weekSumsForSunday(sun);
+      $('wsTotal').textContent = baht(wk.ouy + wk.yo + wk.tongAo * 2);
+      $('wsOuy').textContent = baht(wk.ouy);
+      $('wsYo').textContent = baht(wk.yo);
+      $('wsTong').textContent = baht(wk.tongAo);
+      $('wsAo').textContent = baht(wk.tongAo);
+      const end = new Date(sun + 'T00:00:00');
+      const start = new Date(end); start.setDate(start.getDate() - 6);
+      const fmt = (dt)=> `${dt.getDate()}/${dt.getMonth()+1}`;
+      $('wsRange').textContent = `${fmt(start)} – ${fmt(end)}`;
+    }
+    function openAddWithDate(iso){
+      openAdd();
+      if(iso) $('f_date').value = iso;
+    }
+    function updateConfirmBtn(){
+      const b = $('c_confirmBtn');
+      if(!b) return;
+      b.classList.toggle('on', editingClientConfirmed);
+      b.textContent = editingClientConfirmed ? '✓ คอนเฟิร์มเรียบร้อย พร้อมส่งต่อแล้ว' : '⬜ จิ้มเมื่อคอนเฟิร์มเรียบร้อย พร้อมส่งต่อ';
+    }
+    function startPresence(){
+      const el = $('liveCount');
+      if(!el) return;
+      let n = 1 + Math.floor(Math.random()*3);
+      el.textContent = n;
+      if(startPresence._t) clearInterval(startPresence._t);
+      startPresence._t = setInterval(()=>{
+        n = Math.min(7, Math.max(1, n + (Math.random() < 0.5 ? -1 : 1)));
+        el.textContent = n;
+      }, 5000);
+    }
+
+    function getFiltered(){
+      const month = $('filterMonth').value;
+      const type = $('filterType').value;
+      const result = $('filterResult').value;
+      const search = $('searchBox').value.trim().toLowerCase();
+      return jobs.filter(j=>{
+        if(selectedDate){ if(j.date !== selectedDate) return false; }
+        else if(month && monthKey(j.date) !== month) return false;
+        if(type && j.type !== type) return false;
+        if(result && j.result !== result) return false;
+        if(search && !(j.event||'').toLowerCase().includes(search)) return false;
+        return true;
+      }).sort((a,b)=> (b.date||'').localeCompare(a.date||'') || (b.time||'').localeCompare(a.time||''));
+    }
+
+    function populateMonthFilter(){
+      const sel = $('filterMonth');
+      const current = sel.value;
+      const keys = Array.from(new Set(jobs.map(j=>monthKey(j.date)).filter(Boolean))).sort().reverse();
+      sel.innerHTML = '<option value="">ทั้งหมด</option>' + keys.map(k=>`<option value="${k}">${monthLabel(k)}</option>`).join('');
+      if(keys.includes(current)) sel.value = current;
+    }
+
+    function populateEventList(){
+      const dl = $('eventList');
+      const names = Array.from(new Set(jobs.map(j=>j.event).filter(Boolean)));
+      dl.innerHTML = names.map(n=>`<option value="${n.replace(/"/g,'&quot;')}">`).join('');
+    }
+
+    function resultBadge(r){
+      if(r === 'ได้') return '<span class="badge badge-y">ได้</span>';
+      if(r === 'coming') return '<span class="badge badge-c">coming</span>';
+      return '<span class="badge badge-n">ไม่ได้</span>';
+    }
+    function typeBadge(t){
+      return t === 'กดบัตร' ? '<span class="badge badge-bid">กดบัตร</span>' : '<span class="badge badge-form">กรอกฟอร์ม</span>';
+    }
+
+    function render(){
+      const filtered = getFiltered();
+      let sumTotal=0, sumBid=0, sumForm=0, sumOuyYo=0, sumComm=0, countDone=0, countComing=0;
+      filtered.forEach(j=>{
+        const c = calc(j);
+        sumTotal += c.total;
+        if(j.type === 'กดบัตร') sumBid += c.total; else sumForm += c.total;
+        sumOuyYo += c.ouyIncome + c.yoIncome;
+        sumComm += c.commission;
+        if(j.result === 'ได้') countDone++;
+        if(j.result === 'coming') countComing++;
+      });
+
+      $('heroTotal').textContent = Math.round(sumTotal).toLocaleString('th-TH');
+      $('stCount').textContent = filtered.length;
+      $('stDone').textContent = countDone;
+      $('stComing').textContent = countComing;
+      $('ticketNo').textContent = String(jobs.length).padStart(4,'0');
+      $('chipBid').textContent = baht(sumBid);
+      $('chipForm').textContent = baht(sumForm);
+      $('chipOuyYo').textContent = baht(sumOuyYo);
+      $('chipComm').textContent = baht(sumComm);
+      updateWeekStrip();
+
+      const monthVal = $('filterMonth').value;
+      if(selectedDate){
+        $('heroPeriod').textContent = 'วันที่ ' + toThaiDate(selectedDate);
+      } else {
+        $('heroPeriod').textContent = monthVal ? monthLabel(monthVal) : 'แสดงข้อมูลทั้งหมด';
+      }
+      $('periodLabelInline').textContent = '';
+
+      const tbody = $('tbody');
+      tbody.innerHTML = '';
+      $('emptyState').classList.toggle('hidden', filtered.length !== 0);
+
+      filtered.forEach(j=>{
+        const c = calc(j);
+        const main = document.createElement('tr');
+        main.className = 'job-row';
+        main.innerHTML = `
+          <td><div class="date-main">${toThaiDate(j.date)}</div><div class="date-sub">${j.time||''}</div></td>
+          <td><div class="ev-name">${escapeHtml(j.event)||'-'}</div>${j.type==='กดบัตร' && j.website ? `<div class="ev-site">${escapeHtml(j.website)}</div>` : ''}</td>
+          <td>${typeBadge(j.type)}</td>
+          <td>${resultBadge(j.result)}</td>
+          <td>${num(j.tickets)}</td>
+          <td class="amt amt-strong">${baht(c.total)}</td>
+          <td class="amt">${baht(c.outongTotal)}</td>
+          <td class="amt">${baht(c.avgOutong)}</td>
+          <td>
+            <div class="actions">
+              <button class="icon-btn" data-edit="${j.id}" title="แก้ไข">✎</button>
+              <button class="icon-btn" data-del="${j.id}" title="ลบ">🗑</button>
+            </div>
+          </td>`;
+        tbody.appendChild(main);
+
+        const detail = document.createElement('tr');
+        detail.className = 'detail-row hidden';
+        detail.id = 'detail-' + j.id;
+        detail.innerHTML = `<td colspan="9"><div class="detail-grid">
+            <div class="d">จำนวนลูกค้า<b>${num(j.customers)}</b></div>
+            ${j.type==='กดบัตร' ? `
+            <div class="d">ออย (ใบ)<b>${num(j.ouy)} · ${baht(c.ouyIncome)}</b></div>
+            <div class="d">โย (ใบ)<b>${num(j.yo)} · ${baht(c.yoIncome)}</b></div>
+            <div class="d">ออ+ตองรวม (ใบ)<b>${num(j.outong)}</b></div>
+            <div class="d">commission<b>${baht(c.commission)}</b></div>` : ''}
+            <div class="d">ยกเลิก<b>${baht(num(j.cancel))}</b></div>
+            <div class="d">tip<b>${baht(num(j.tip))}</b></div>
+        </div>
+        ${(j.type==='กดบัตร' && (j.clients||[]).length) ? `
+        <div class="d" style="margin-top:12px;">รายชื่อลูกค้า
+          <div class="client-detail-list">
+            ${j.clients.map(cl=>`
+              <div class="client-row">
+                <span class="cl-name">${escapeHtml(cl.name)||'(ไม่มีชื่อ)'}</span>
+                <span class="badge ${cl.source==='Line OA'?'badge-line':'badge-x'}">${escapeHtml(cl.source||'X')}</span>
+                <button type="button" class="cl-confirm ${cl.confirmed?'on':''}" data-confirm-job="${j.id}" data-confirm-client="${cl.id}">${cl.confirmed?'✓ คอนเฟิร์มแล้ว':'จิ้มเพื่อคอนเฟิร์ม'}</button>
+                <button type="button" class="icon-btn" data-copy-job="${j.id}" data-copy-client="${cl.id}" title="คัดลอก confirmation">📋</button>
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+        </td>`;
+        tbody.appendChild(detail);
+
+        main.addEventListener('click', (e)=>{
+          if(e.target.closest('.icon-btn')) return;
+          detail.classList.toggle('hidden');
+        });
+      });
+
+      tbody.querySelectorAll('[data-edit]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{ e.stopPropagation(); openEdit(btn.dataset.edit); });
+      });
+      tbody.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{ e.stopPropagation(); askDelete(btn.dataset.del); });
+      });
+      tbody.querySelectorAll('[data-copy-client]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          copyClientNoteById(btn.dataset.copyJob, btn.dataset.copyClient);
+        });
+      });
+      tbody.querySelectorAll('[data-confirm-client]').forEach(btn=>{
+        btn.addEventListener('click', async (e)=>{
+          e.stopPropagation();
+          const job = jobs.find(x=>x.id===btn.dataset.confirmJob);
+          const cl = job && (job.clients||[]).find(c=>c.id===btn.dataset.confirmClient);
+          if(!cl) return;
+          cl.confirmed = !cl.confirmed;
+          btn.classList.toggle('on', cl.confirmed);
+          btn.textContent = cl.confirmed ? '✓ คอนเฟิร์มแล้ว' : 'จิ้มเพื่อคอนเฟิร์ม';
+          try{
+            await jobsColRef.doc(job.id).set(job);
+            showToast(cl.confirmed ? 'คอนเฟิร์มเรียบร้อย ✓ พร้อมส่งต่อ' : 'ยกเลิกคอนเฟิร์มแล้ว');
+          }catch(err){
+            cl.confirmed = !cl.confirmed;
+            showToast('บันทึกไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต');
+          }
+        });
+      });
+
+      populateMonthFilter();
+      populateEventList();
+      renderCalendar();
+    }
+
+    function escapeHtml(s){
+      if(!s) return '';
+      return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function isoLocal(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function todayIso(){ return isoLocal(new Date()); }
+
+    function parseTimeMinutes(t){
+      if(!t) return null;
+      const mt = String(t).match(/^(\d{1,2}):(\d{2})/);
+      if(!mt) return null;
+      return parseInt(mt[1],10)*60 + parseInt(mt[2],10);
+    }
+    function sortJobsByTime(list){
+      return list.slice().sort((a,b)=>{
+        const ta = parseTimeMinutes(a.time), tb = parseTimeMinutes(b.time);
+        if(ta===null && tb===null) return 0;
+        if(ta===null) return 1;
+        if(tb===null) return -1;
+        return ta - tb;
+      });
+    }
+
+    function shiftCalMonth(delta){
+      let [y,m] = calMonth.split('-').map(Number);
+      m += delta;
+      if(m < 1){ m = 12; y -= 1; }
+      else if(m > 12){ m = 1; y += 1; }
+      calMonth = `${y}-${String(m).padStart(2,'0')}`;
+      renderCalendar();
+    }
+
+    function weekSumsForSunday(sundayIso){
+      const end = new Date(sundayIso + 'T00:00:00');
+      const start = new Date(end);
+      start.setDate(start.getDate() - 6);
+      const type = $('filterType').value;
+      const result = $('filterResult').value;
+      const search = $('searchBox').value.trim().toLowerCase();
+      let ouy = 0, yo = 0, tongAo = 0;
+      jobs.forEach(j=>{
+        if(!j.date) return;
+        if(type && j.type !== type) return;
+        if(result && j.result !== result) return;
+        if(search && !(j.event||'').toLowerCase().includes(search)) return;
+        const d = new Date(j.date + 'T00:00:00');
+        if(d < start || d > end) return;
+        const c = calc(j);
+        ouy += c.ouyIncome;
+        yo += c.yoIncome;
+        tongAo += c.avgOutong;
+      });
+      return { ouy, yo, tongAo };
+    }
+
+    function renderCalendar(){
+      const [y, m] = calMonth.split('-').map(Number);
+      $('calTitle').textContent = monthLabel(calMonth);
+
+      const type = $('filterType').value;
+      const result = $('filterResult').value;
+      const search = $('searchBox').value.trim().toLowerCase();
+      const byDate = {};
+      jobs.forEach(j=>{
+        if(!j.date) return;
+        if(type && j.type !== type) return;
+        if(result && j.result !== result) return;
+        if(search && !(j.event||'').toLowerCase().includes(search)) return;
+        (byDate[j.date] = byDate[j.date] || []).push(j);
+      });
+
+      const dow = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+      const firstDow = new Date(y, m-1, 1).getDay();
+      const daysInMonth = new Date(y, m, 0).getDate();
+      const today = todayIso();
+
+      let html = dow.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+      for(let i=0; i<firstDow; i++) html += '<div class="cal-cell empty"></div>';
+
+      for(let day=1; day<=daysInMonth; day++){
+        const iso = `${y}-${String(m).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const dayJobs = sortJobsByTime(byDate[iso] || []);
+        const isSunday = new Date(y, m-1, day).getDay() === 0;
+
+        let jobsHtml = '', avgHtml = '', settleHtml = '';
+        if(dayJobs.length){
+          const shown = dayJobs.slice(0,3);
+          jobsHtml = '<div class="cal-jobs">' + shown.map(j=>{
+            const label = `${j.time ? j.time+' · ' : ''}${j.type||''} · ${j.event||'(ไม่มีชื่อ)'}`;
+            return `<div class="cal-job-pill ${j.type==='กดบัตร'?'bid':'form'}" data-job-id="${j.id}" tabindex="0" role="button" title="${escapeHtml(label)} (กดเพื่อแก้ไข)">${escapeHtml(label)}</div>`;
+          }).join('') + (dayJobs.length>3 ? `<div class="cal-job-more">+${dayJobs.length-3} งานอื่น</div>` : '') + '</div>';
+          const avgSum = dayJobs.reduce((s,j)=> s + calc(j).avgOutong, 0);
+          avgHtml = `<div class="cal-avg-tag">เฉลี่ยตอง/ออ ${baht(avgSum)}</div>`;
+        }
+        if(isSunday){
+          const wk = weekSumsForSunday(iso);
+          const settled = !!settlements[iso];
+          settleHtml = `<div class="cal-settle">
+              <div class="cal-settle-amt">🧾 เคลียร์ยอดรวม ${baht(wk.ouy + wk.yo + wk.tongAo*2)}</div>
+              <button type="button" class="cal-settle-btn ${settled?'settled':'pending'}" data-settle="${iso}">${settled ? '✓ โอนแล้ว' : 'ยังไม่โอน'}</button>
+            </div>`;
+        }
+
+        const classes = ['cal-cell'];
+        if(iso === today) classes.push('today');
+        if(iso === selectedDate) classes.push('selected');
+        if(isSunday) classes.push('sunday');
+        const ariaLabel = `${day} ${monthLabel(calMonth)}` + (dayJobs.length ? ` มี ${dayJobs.length} งาน` : '') + (isSunday ? ' วันเคลียร์ยอด' : '');
+
+        html += `<div class="${classes.join(' ')}" data-date="${iso}" tabindex="0" role="button" aria-label="${ariaLabel}">
+            <div class="cal-date-row">
+              <span class="cal-date">${day}</span>
+              <div class="cal-date-right">
+                ${isSunday ? '<span class="cal-sun-tag">เคลียร์ยอด</span>' : ''}
+                <button type="button" class="cal-add" data-add-date="${iso}" title="สร้างงานวันนี้" aria-label="สร้างงานวันที่ ${day}">+</button>
+              </div>
+            </div>
+            ${jobsHtml}
+            ${avgHtml}
+            ${settleHtml}
+          </div>`;
+      }
+
+      $('calGrid').innerHTML = html;
+      $('calGrid').querySelectorAll('.cal-cell[data-date]').forEach(cell=>{
+        const toggle = ()=>{
+          const d = cell.dataset.date;
+          selectedDate = (selectedDate === d) ? null : d;
+          render();
+        };
+        cell.addEventListener('click', toggle);
+        cell.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); }
+        });
+      });
+      $('calGrid').querySelectorAll('[data-settle]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          toggleSettlement(btn.dataset.settle);
+        });
+      });
+      $('calGrid').querySelectorAll('[data-add-date]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{ e.stopPropagation(); openAddWithDate(btn.dataset.addDate); });
+      });
+      $('calGrid').querySelectorAll('.cal-job-pill[data-job-id]').forEach(pill=>{
+        const goEdit = (e)=>{ e.stopPropagation(); openEdit(pill.dataset.jobId); };
+        pill.addEventListener('click', goEdit);
+        pill.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); goEdit(e); }
+        });
+      });
+      $('calClear').classList.toggle('hidden', !selectedDate);
+    }
+
+    function setType(t){
+      $('typeOptBid').classList.toggle('active-bid', t==='กดบัตร');
+      $('typeOptForm').classList.toggle('active-form', t==='กรอกฟอร์ม');
+      $('typeOptBid').dataset.active = (t==='กดบัตร') ? '1' : '0';
+      $('typeOptForm').dataset.active = (t==='กรอกฟอร์ม') ? '1' : '0';
+      $('websiteField').classList.toggle('hidden', t!=='กดบัตร');
+      $('ouyField').classList.toggle('hidden', t!=='กดบัตร');
+      $('yoField').classList.toggle('hidden', t!=='กดบัตร');
+      $('outongField').classList.toggle('hidden', t!=='กดบัตร');
+      $('customersNumField').classList.toggle('hidden', t==='กดบัตร');
+      $('clientsField').classList.toggle('hidden', t!=='กดบัตร');
+      updatePreview();
+    }
+    function currentType(){
+      return $('typeOptBid').dataset.active === '1' ? 'กดบัตร' : 'กรอกฟอร์ม';
+    }
+
+    function renderClientsList(){
+      $('clientsCountLabel').textContent = editingClients.length ? `(${editingClients.length} คน)` : '';
+      const list = $('clientsList');
+      if(!editingClients.length){
+        list.innerHTML = '<div class="clients-empty">ยังไม่มีลูกค้า กดปุ่มด้านล่างเพื่อเพิ่ม</div>';
+        return;
+      }
+      list.innerHTML = editingClients.map(c=>`
+        <div class="client-row">
+          <span class="cl-name">${escapeHtml(c.name)||'(ไม่มีชื่อ)'}</span>
+          <span class="badge ${c.source==='Line OA'?'badge-line':'badge-x'}">${escapeHtml(c.source||'X')}</span>
+          <button type="button" class="cl-confirm ${c.confirmed?'on':''}" data-client-confirm="${c.id}">${c.confirmed?'✓ คอนเฟิร์มแล้ว':'จิ้มเพื่อคอนเฟิร์ม'}</button>
+          <span class="cl-note-flag">${c.note && c.note.trim() ? '✓ มี confirmation' : 'ยังไม่มี'}</span>
+          <div class="actions">
+            <button type="button" class="icon-btn" data-client-edit="${c.id}" title="แก้ไข">✎</button>
+            <button type="button" class="icon-btn" data-client-del="${c.id}" title="ลบ">🗑</button>
+          </div>
+        </div>`).join('');
+      list.querySelectorAll('[data-client-edit]').forEach(btn=>{
+        btn.addEventListener('click', ()=> openClientEditor(btn.dataset.clientEdit));
+      });
+      list.querySelectorAll('[data-client-confirm]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const c = editingClients.find(x=>x.id===btn.dataset.clientConfirm);
+          if(c){ c.confirmed = !c.confirmed; renderClientsList(); }
+        });
+      });
+      list.querySelectorAll('[data-client-del]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          editingClients = editingClients.filter(c=>c.id !== btn.dataset.clientDel);
+          renderClientsList();
+        });
+      });
+    }
+
+    function openClientEditor(id){
+      editingClientId = id || null;
+      const c = id ? editingClients.find(x=>x.id===id) : null;
+      $('clientFormTitle').textContent = c ? 'แก้ไขลูกค้า' : 'เพิ่มลูกค้า';
+      $('c_name').value = c ? c.name : '';
+      $('c_source').value = c ? (c.source || 'X') : 'X';
+      $('c_note').value = c ? (c.note || '') : '';
+      $('clientDeleteBtn').classList.toggle('hidden', !c);
+      editingClientConfirmed = c ? !!c.confirmed : false;
+      updateConfirmBtn();
+      $('clientOverlay').classList.add('show');
+    }
+    function closeClientEditor(){ $('clientOverlay').classList.remove('show'); }
+
+    function saveClientEditor(){
+      const name = $('c_name').value.trim();
+      if(!name){ showToast('กรุณากรอกชื่อลูกค้า'); return; }
+      const data = { id: editingClientId || genId(), name, source: $('c_source').value, note: $('c_note').value, confirmed: editingClientConfirmed };
+      if(editingClientId){
+        const idx = editingClients.findIndex(c=>c.id===editingClientId);
+        if(idx>-1) editingClients[idx] = data;
+      } else {
+        editingClients.push(data);
+      }
+      closeClientEditor();
+      renderClientsList();
+    }
+
+    function deleteClientFromEditor(){
+      if(editingClientId) editingClients = editingClients.filter(c=>c.id !== editingClientId);
+      closeClientEditor();
+      renderClientsList();
+    }
+
+    async function copyClientNote(){
+      const text = $('c_note').value;
+      if(!text.trim()){ showToast('ยังไม่มี confirmation ให้คัดลอก'); return; }
+      try{ await navigator.clipboard.writeText(text); showToast('คัดลอก confirmation แล้ว'); }
+      catch(e){ showToast('คัดลอกไม่สำเร็จ ลองคัดลอกด้วยตนเอง'); }
+    }
+
+    async function copyClientNoteById(jobId, clientId){
+      const job = jobs.find(x=>x.id===jobId);
+      const cl = job && (job.clients||[]).find(c=>c.id===clientId);
+      if(!cl || !cl.note || !cl.note.trim()){ showToast('ยังไม่มี confirmation ให้คัดลอก'); return; }
+      try{ await navigator.clipboard.writeText(cl.note); showToast('คัดลอก confirmation แล้ว'); }
+      catch(e){ showToast('คัดลอกไม่สำเร็จ ลองคัดลอกด้วยตนเอง'); }
+    }
+
+    function updatePreview(){
+      const job = {
+        type: currentType(),
+        tickets: $('f_tickets').value, ouy: $('f_ouy').value, yo: $('f_yo').value,
+        outong: $('f_outong').value, cancel: $('f_cancel').value, tip: $('f_tip').value
+      };
+      const c = calc(job);
+      $('pv_total').textContent = baht(c.total);
+      $('pv_comm').textContent = baht(c.commission);
+      $('pv_outong').textContent = baht(c.outongTotal);
+      $('pv_ouy').textContent = baht(c.ouyIncome);
+      $('pv_yo').textContent = baht(c.yoIncome);
+      $('pv_avg').textContent = baht(c.avgOutong);
+    }
+
+    function openAdd(){
+      editingId = null;
+      $('formTitle').textContent = 'เพิ่มงานใหม่';
+      $('f_date').value = todayIso();
+      $('f_time').value = '';
+      $('f_event').value = '';
+      $('f_website').value = '';
+      $('f_customers').value = 1;
+      $('f_result').value = 'coming';
+      $('f_tickets').value = 0;
+      $('f_ouy').value = 0;
+      $('f_yo').value = 0;
+      $('f_outong').value = 0;
+      $('f_cancel').value = 0;
+      $('f_tip').value = 0;
+      editingClients = [];
+      editingClientId = null;
+      renderClientsList();
+      setType('กดบัตร');
+      $('formOverlay').classList.add('show');
+    }
+    function openEdit(id){
+      const j = jobs.find(x=>x.id===id);
+      if(!j) return;
+      editingId = id;
+      $('formTitle').textContent = 'แก้ไขงาน';
+      $('f_date').value = j.date || '';
+      $('f_time').value = j.time || '';
+      $('f_event').value = j.event || '';
+      $('f_website').value = j.website || '';
+      $('f_customers').value = num(j.customers);
+      $('f_result').value = j.result || 'coming';
+      $('f_tickets').value = num(j.tickets);
+      $('f_ouy').value = num(j.ouy);
+      $('f_yo').value = num(j.yo);
+      $('f_outong').value = num(j.outong);
+      $('f_cancel').value = num(j.cancel);
+      $('f_tip').value = num(j.tip);
+      editingClients = (j.clients || []).map(c=>({...c}));
+      editingClientId = null;
+      renderClientsList();
+      setType(j.type || 'กดบัตร');
+      $('formOverlay').classList.add('show');
+    }
+    function closeForm(){ $('formOverlay').classList.remove('show'); }
+
+    async function saveForm(){
+      const event = $('f_event').value.trim();
+      if(!event){ showToast('กรุณากรอกชื่องาน'); return; }
+      const job = {
+        id: editingId || genId(),
+        type: currentType(),
+        date: $('f_date').value,
+        time: $('f_time').value.trim(),
+        event,
+        website: $('f_website').value.trim(),
+        customers: currentType()==='กดบัตร' ? editingClients.length : $('f_customers').value,
+        clients: currentType()==='กดบัตร' ? editingClients.map(c=>({...c})) : [],
+        result: $('f_result').value,
+        tickets: $('f_tickets').value,
+        ouy: $('f_ouy').value,
+        yo: $('f_yo').value,
+        outong: $('f_outong').value,
+        cancel: $('f_cancel').value,
+        tip: $('f_tip').value
+      };
+      if(editingId){
+        const idx = jobs.findIndex(x=>x.id===editingId);
+        if(idx>-1) jobs[idx] = job;
+      } else {
+        jobs.push(job);
+      }
+      closeForm();
+      render();
+      try{
+        await jobsColRef.doc(job.id).set(job);
+        showToast('บันทึกงานสำเร็จ');
+      }catch(e){
+        showToast('บันทึกไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
+      }
+    }
+
+    function askDelete(id){
+      pendingDeleteId = id; pendingReset = false;
+      $('confirmTitle').textContent = 'ลบงานนี้?';
+      $('confirmMsg').textContent = 'ต้องการลบงานนี้หรือไม่ การลบไม่สามารถย้อนกลับได้';
+      $('confirmOverlay').classList.add('show');
+    }
+    function askReset(){
+      pendingReset = true; pendingDeleteId = null;
+      $('confirmTitle').textContent = 'ล้างข้อมูลทั้งหมด?';
+      $('confirmMsg').textContent = 'งานทุกรายการที่บันทึกไว้จะถูกลบทั้งหมด และไม่สามารถย้อนกลับได้';
+      $('confirmOverlay').classList.add('show');
+    }
+    async function confirmOk(){
+      if(pendingDeleteId){
+        const id = pendingDeleteId;
+        jobs = jobs.filter(j=>j.id!==id);
+        render();
+        try{
+          await jobsColRef.doc(id).delete();
+          showToast('ลบงานแล้ว');
+        }catch(e){
+          showToast('ลบไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต');
+        }
+      } else if(pendingReset){
+        jobs = [];
+        render();
+        try{
+          const snap = await jobsColRef.get();
+          const batch = db.batch();
+          snap.docs.forEach(d=> batch.delete(d.ref));
+          await batch.commit();
+          showToast('ล้างข้อมูลทั้งหมดแล้ว');
+        }catch(e){
+          showToast('ล้างข้อมูลไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต');
+        }
+      }
+      $('confirmOverlay').classList.remove('show');
+    }
+
+    function exportCsv(){
+      const rows = getFiltered();
+      const header = ['วันที่','เวลา','event','ประเภทงาน','website','จำนวนลูกค้า','ผลลัพธ์','จำนวนใบที่ได้','ออย','โย','ออ+ตองรวม','ยกเลิก','tip','รายได้ทั้งหมด','รายได้ออย','รายได้โย','commission','รายได้รวมออ+ตอง','เฉลี่ยออ+ตอง'];
+      const lines = [header.join(',')];
+      rows.forEach(j=>{
+        const c = calc(j);
+        const line = [toThaiDate(j.date), j.time, j.event, j.type, j.website, num(j.customers), j.result,
+          num(j.tickets), num(j.ouy), num(j.yo), num(j.outong), num(j.cancel), num(j.tip),
+          Math.round(c.total), Math.round(c.ouyIncome), Math.round(c.yoIncome), Math.round(c.commission),
+          Math.round(c.outongTotal), Math.round(c.avgOutong)]
+          .map(v => `"${String(v??'').replace(/"/g,'""')}"`).join(',');
+        lines.push(line);
+      });
+      const blob = new Blob(['\uFEFF' + lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'shiningdream-jobs.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    /* ---------- Wire up ---------- */
+    $('addBtn').addEventListener('click', openAdd);
+    $('formCloseBtn').addEventListener('click', closeForm);
+    $('formCancelBtn').addEventListener('click', closeForm);
+    $('formSaveBtn').addEventListener('click', saveForm);
+    $('typeOptBid').addEventListener('click', ()=>setType('กดบัตร'));
+    $('typeOptForm').addEventListener('click', ()=>setType('กรอกฟอร์ม'));
+    $('addClientBtn').addEventListener('click', ()=> openClientEditor(null));
+    $('clientCloseBtn').addEventListener('click', closeClientEditor);
+    $('clientCancelBtn').addEventListener('click', closeClientEditor);
+    $('clientSaveBtn').addEventListener('click', saveClientEditor);
+    $('clientCopyBtn').addEventListener('click', copyClientNote);
+    $('clientDeleteBtn').addEventListener('click', deleteClientFromEditor);
+    $('c_confirmBtn').addEventListener('click', ()=>{ editingClientConfirmed = !editingClientConfirmed; updateConfirmBtn(); });
+    $('clientOverlay').addEventListener('click', (e)=>{ if(e.target.id==='clientOverlay') closeClientEditor(); });
+    ['f_tickets','f_ouy','f_yo','f_outong','f_cancel','f_tip'].forEach(id=>{
+      $(id).addEventListener('input', updatePreview);
+    });
+    $('confirmCancelBtn').addEventListener('click', ()=> $('confirmOverlay').classList.remove('show'));
+    $('confirmOkBtn').addEventListener('click', confirmOk);
+    $('resetBtn').addEventListener('click', askReset);
+    $('exportBtn').addEventListener('click', exportCsv);
+    $('calPrev').addEventListener('click', ()=> shiftCalMonth(-1));
+    $('calNext').addEventListener('click', ()=> shiftCalMonth(1));
+    $('calToday').addEventListener('click', ()=>{ calMonth = todayIso().slice(0,7); renderCalendar(); });
+    $('calClear').addEventListener('click', ()=>{ selectedDate = null; render(); });
+    $('filterMonth').addEventListener('change', ()=>{ if($('filterMonth').value) calMonth = $('filterMonth').value; });
+    ['filterMonth','filterType','filterResult'].forEach(id=> $(id).addEventListener('change', render));
+    $('searchBox').addEventListener('input', render);
+    document.querySelectorAll('.step-btn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const inp = document.getElementById(b.dataset.target);
+        if(!inp) return;
+        const step = parseInt(b.dataset.step,10) || 0;
+        let v = parseInt(inp.value || '0', 10); if(isNaN(v)) v = 0;
+        v = Math.max(0, v + step);
+        inp.value = v;
+        inp.dispatchEvent(new Event('input', { bubbles:true }));
+      });
+    });
+    $('formOverlay').addEventListener('click', (e)=>{ if(e.target.id==='formOverlay') closeForm(); });
+    $('confirmOverlay').addEventListener('click', (e)=>{ if(e.target.id==='confirmOverlay') $('confirmOverlay').classList.remove('show'); });
+
+    (function(){
+      startRealtimeSync();
+      startPresence();
+    })();
+})();
+</script>
+</body>
+</html>
+
     body { background: #FFF7EC; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
     #__bundler_loading { position: fixed; bottom: 20px; right: 20px; font: 13px/1.4 -apple-system, BlinkMacSystemFont, sans-serif; color: #666; background: #fff; padding: 8px 14px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); z-index: 10000; }
     #__bundler_thumbnail { position: fixed; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #FFF7EC; z-index: 9999; }
