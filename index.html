@@ -419,8 +419,8 @@
     .empty-state .ico{ font-size:40px; margin-bottom:10px; }
 
     /* ===== Queue (คิวจองล่วงหน้า) ===== */
-    .queue-card{ background:var(--paper); border:2px solid var(--line); border-radius:var(--card-radius); padding:16px 20px 18px; margin-bottom:24px; box-shadow:var(--card-shadow); position:relative; overflow:hidden; }
-    .queue-card::before{ content:''; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,#56A744,#2E97D6,#7A5BB0); }
+    .queue-card{ background:var(--paper); border:2px solid var(--line); border-radius:var(--card-radius); padding:16px 20px 18px; margin-bottom:24px; box-shadow:var(--card-shadow); position:relative; overflow:visible; }
+    .queue-card::before{ content:''; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,#56A744,#2E97D6,#7A5BB0); border-radius:var(--card-radius) var(--card-radius) 0 0; }
     .app.clean .queue-card{ border:1.5px solid var(--line); }
     .queue-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:6px; }
     .queue-title{ font-family:'Mali',sans-serif; font-weight:700; font-size:18px; display:flex; align-items:center; gap:9px; color:var(--ink); }
@@ -428,6 +428,23 @@
     .app.clean .queue-count{ box-shadow:none; }
     .queue-sub{ font-size:12.5px; color:var(--ink-soft); margin:7px 0 0; font-family:'Sarabun',sans-serif; }
     .queue-customers{ display:flex; flex-wrap:wrap; gap:7px; margin:13px 0 2px; }
+    .queue-arrived-card{ background:var(--paper); border:2px dashed var(--line); border-radius:var(--card-radius); padding:16px 20px 18px; margin-bottom:24px; }
+    .queue-arrived-card.hidden{ display:none; }
+    .queue-history-card{ background:var(--paper); border:2px solid var(--line-soft); border-radius:var(--card-radius); padding:16px 20px 18px; margin-bottom:24px; }
+    .queue-history-card.hidden{ display:none; }
+    .qh-item{ background:var(--cream,#FFF8EE); border:1.5px solid var(--line); border-radius:12px; padding:10px 14px; margin-bottom:8px; }
+    .qh-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
+    .qh-event{ font-family:'Mali',sans-serif; font-weight:600; font-size:13.5px; color:var(--ink); flex:1; }
+    .qh-date{ font-size:11px; color:var(--ink-soft); white-space:nowrap; }
+    .qh-clients{ font-size:12px; color:var(--ink-soft); }
+    .qh-toggle-btn{ width:100%; display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; font-family:'Mali',sans-serif; font-weight:700; font-size:13px; color:var(--ink); padding:0 0 10px 0; text-align:left; }
+    .qh-arrow{ margin-left:auto; font-size:11px; color:var(--ink-soft); }
+    .qh-restore-btn{ font-family:'Mali',sans-serif; font-size:11.5px; font-weight:600; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); border-radius:999px; padding:3px 10px; cursor:pointer; white-space:nowrap; }
+    .qh-restore-btn:hover{ border-color:var(--green-deep); color:var(--green-deep); }
+    .qh-delete-btn{ font-size:13px; border:none; background:none; cursor:pointer; padding:3px 6px; opacity:.5; border-radius:6px; }
+    .qh-delete-btn:hover{ opacity:1; background:var(--red-bg); }
+    .queue-arrived-head{ font-family:'Mali',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+    .queue-arrived-count{ background:var(--line-soft); border:1.5px solid var(--line); border-radius:999px; font-size:11px; padding:1px 8px; color:var(--ink-soft); }
     .q-cust{ display:inline-flex; flex-direction:column; align-items:flex-start; gap:1px; background:var(--line-soft); border:1.5px solid var(--line); border-radius:13px; padding:5px 11px; font-size:12.5px; font-family:'Mali',sans-serif; color:var(--ink); }
     .q-cust b{ color:var(--green-deep); margin-left:3px; }
     .q-cust.full{ background:#FFE2E0; border-color:#FFB3AD; }
@@ -627,26 +644,25 @@
     .app.dark .reconcile-explain.over{ background:#33321c; border-color:#54512a; color:#e3c878; }
     .app.dark .reconcile-explain.ok{ background:#1f3326; border-color:#2f5238; color:#8fd49e; }
     .reconcile-explain b{ font-family:'Mali',sans-serif; font-weight:700; }
-    .rec-table{ width:100%; border-collapse:collapse; }
-    .rec-table th{ font-family:'Mali',sans-serif; font-weight:600; font-size:11.5px; color:var(--ink-soft); text-align:right; padding:6px 8px; border-bottom:2px solid var(--line); }
-    .rec-table th:first-child{ text-align:left; }
-    .rec-table td{ font-family:'Sarabun',sans-serif; font-size:13.5px; color:var(--ink); text-align:right; padding:9px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap; }
-    .rec-table td:first-child{ text-align:left; font-family:'Mali',sans-serif; font-weight:600; }
-    .rec-table tr.unsettled td{ color:var(--ink); }
-    .rec-table .rec-amt{ font-family:'Fredoka',sans-serif; font-weight:600; }
+    .rec-row{ display:flex; flex-direction:column; gap:6px; padding:12px 14px; border-bottom:1px solid var(--line-soft); }
+    .rec-row:last-child{ border-bottom:none; }
+    .rec-row.settled{ opacity:.75; }
+    .rec-row-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .rec-row-week{ font-family:'Mali',sans-serif; font-weight:700; font-size:14px; color:var(--ink); flex:1; }
+    .rec-row-info{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .rec-row-count{ font-size:12px; color:var(--ink-soft); }
+    .rec-foot-row{ background:var(--line-soft); border-radius:0 0 12px 12px; }
+    .rec-foot-row .rec-row-week{ font-weight:700; }
+    .rec-amt{ font-family:'Fredoka',sans-serif; font-weight:600; font-size:15px; }
     .rec-pill{ display:inline-block; font-family:'Mali',sans-serif; font-weight:600; font-size:11px; border-radius:999px; padding:2px 9px; }
     .rec-pill.settled{ background:#DEF3D9; color:var(--green-deep); }
     .rec-pill.pending{ background:#FBE3D6; color:#C0673C; }
     .app.dark .rec-pill.settled{ background:#1f3326; color:#8fd49e; }
     .app.dark .rec-pill.pending{ background:#352a23; color:#e8a878; }
-    .rec-table tfoot td, .rec-table .rec-foot td{ font-family:'Mali',sans-serif; font-weight:700; border-top:2px solid var(--line); border-bottom:none; padding-top:11px; color:var(--ink); }
-    .rec-empty{ text-align:center; color:var(--ink-soft); font-size:13.5px; padding:20px 10px; font-family:'Sarabun',sans-serif; }
-    .rec-pdf-btn{ font-family:'Mali',sans-serif; font-weight:600; font-size:11.5px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); border-radius:999px; padding:5px 11px; cursor:pointer; white-space:nowrap; }
+    .rec-pdf-btn{ font-family:'Mali',sans-serif; font-weight:600; font-size:12px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); border-radius:999px; padding:5px 13px; cursor:pointer; white-space:nowrap; flex-shrink:0; }
     .app.dark .rec-pdf-btn{ background:var(--surf); }
     .rec-pdf-btn:hover{ border-color:var(--red); color:var(--red-deep); }
-    @media (max-width:560px){
-      .rec-table th.hide-sm, .rec-table td.hide-sm{ display:none; }
-    }
+
 
     /* ===== Global search ===== */
     .search-open-btn{ display:inline-flex; align-items:center; gap:7px; background:var(--paper); border:2px solid var(--line); border-radius:999px; padding:7px 15px 7px 13px; cursor:pointer; font-family:'Mali',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); box-shadow:var(--card-shadow); transition:.14s; }
@@ -1003,7 +1019,24 @@
       <p class="queue-sub">จำกัด 5 งาน/คน (รวมกดบัตร+กรอกฟอร์ม) · ติ๊ก ✓ เมื่อรายละเอียดมาแล้ว · ✎ แก้ไข</p>
       <div class="queue-customers" id="queueInlineCustomers"></div>
       <div class="queue-list" id="queueList"></div>
-      <div class="queue-empty" id="queueEmpty">ยังไม่มีคิวจอง · กด “+ เพิ่มคิว” เพื่อเพิ่มงานที่ลูกค้าจองไว้</div>
+      <div class="queue-empty" id="queueEmpty">ยังไม่มีคิวจอง · กด "+ เพิ่มคิว" เพื่อเพิ่มงานที่ลูกค้าจองไว้</div>
+    </div>
+
+    <div class="queue-arrived-card hidden" id="queueArrivedSection">
+      <div class="queue-arrived-head">✅ รายละเอียดมาแล้ว <span class="queue-arrived-count" id="queueArrivedCount">0</span></div>
+      <p class="queue-sub" style="margin-top:0;margin-bottom:12px;">งานที่ติ๊กรายละเอียดมาแล้ว · เก็บไว้เป็นประวัติ ไม่นับในลิมิต 5 งาน/คน</p>
+      <div class="queue-list" id="queueArrivedList"></div>
+    </div>
+
+    <div class="queue-history-card hidden" id="queueHistorySection">
+      <button class="qh-toggle-btn" id="queueHistoryToggle">
+        📁 ประวัติคิวที่เสร็จแล้ว
+        <span class="queue-arrived-count" id="queueHistoryCount">0</span>
+        <span class="qh-arrow" id="queueHistoryArrow">▼</span>
+      </button>
+      <div id="queueHistoryContent" style="display:none;">
+        <div id="queueHistoryList"></div>
+      </div>
     </div>
 
     <div class="cash-card" id="cashCard">
@@ -1382,6 +1415,7 @@
     let queue = [];
     let editingQueueClients = [];
     let editingQueueId = null;
+    let queueHistoryItems = [];
     let qType = 'กดบัตร';
     let memo = '';
     let history = [];
@@ -1395,7 +1429,7 @@
 
     const $ = (id) => document.getElementById(id);
     const num = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
-    const baht = (v) => '฿' + Math.round(v).toLocaleString('th-TH');
+    const baht = (v) => { const rounded = Math.round(v*100)/100; return '฿' + (Number.isInteger(rounded) ? rounded.toLocaleString('th-TH') : rounded.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})); };
     const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
     /* ---------- Locked to "จัดเต็ม" (cute) ---------- */
@@ -1460,6 +1494,7 @@
     const queueColRef = mainDocRef.collection('queue');
     const creditsColRef = mainDocRef.collection('credits');
     const historyColRef = mainDocRef.collection('history');
+    const queueHistoryColRef = mainDocRef.collection('queueHistory');
 
     const migrationChecked = { queue:false, credits:false, history:false };
     async function migrateLegacyArrayIfNeeded(fieldName, colRef){
@@ -1489,6 +1524,10 @@
 
     function startRealtimeSync(){
       migrateLegacyArrayIfNeeded('queue', queueColRef);
+      queueHistoryColRef.orderBy('archivedAt','desc').onSnapshot((snap)=>{
+        queueHistoryItems = snap.docs.map(d=>d.data());
+        renderQueueHistory();
+      }, ()=>{});
       migrateLegacyArrayIfNeeded('credits', creditsColRef);
       migrateLegacyArrayIfNeeded('history', historyColRef);
       jobsColRef.onSnapshot((snap)=>{
@@ -1670,7 +1709,18 @@
     /* ---------- ฟอร์มที่รอผล (subtle) ---------- */
     function renderFormPending(){
       const wrap = $('formPending'); if(!wrap) return;
-      const pending = jobs.filter(j=> j.type==='กรอกฟอร์ม' && j.result==='coming');
+      const todayStr = todayIso();
+      const now = new Date();
+      const nowMinutes = now.getHours()*60 + now.getMinutes();
+      const pending = jobs.filter(j=>{
+        if(j.type!=='กรอกฟอร์ม' || j.result!=='coming' || !j.date) return false;
+        if(j.date < todayStr) return true;   // past date → always show
+        if(j.date > todayStr) return false;  // future date → never show
+        // same day → check time: only show if job time has already passed (or no time set)
+        if(!j.time) return true;
+        const jobMinutes = parseTimeMinutes(j.time);
+        return jobMinutes === null || jobMinutes <= nowMinutes;
+      });
       if(!pending.length){ wrap.style.display='none'; return; }
       wrap.style.display='';
       $('formPendingText').textContent = `มีฟอร์ม ${pending.length} งานที่กรอกแล้วรอผล — อย่าลืมมาลงผลเมื่อทราบ`;
@@ -1819,8 +1869,9 @@
     /* ---------- คิวจองล่วงหน้า (advance booking queue) ---------- */
     const QUEUE_LIMIT = 5;
     function customerCounts(){
+      // Only count items where details have NOT arrived yet (3.1: arrived items are "done", no longer occupy the limit slot)
       const m = {};
-      queue.forEach(q=> (q.clients||[]).forEach(c=>{
+      queue.filter(q=>!q.detailsArrived).forEach(q=> (q.clients||[]).forEach(c=>{
         const k = (c.name||'').trim(); if(!k) return;
         if(!m[k]) m[k] = { total:0, bid:0, form:0 };
         m[k].total++;
@@ -1830,24 +1881,46 @@
     }
     function renderQueue(){
       if(!$('queueList')) return;
-      const counts = customerCounts();
-      $('queueCount').textContent = queue.length;
-      const _qb = $('tabQueueBadge'); if(_qb){ const pending = queue.filter(q=>!q.detailsArrived).length; _qb.textContent = pending; _qb.classList.toggle('hidden', pending===0); }
+      const counts = customerCounts(); // excludes detailsArrived items per 3.1
+      const pendingItems = queue.filter(q=>!q.detailsArrived).sort((a,b)=> (a.createdAt||0)-(b.createdAt||0));
+      const arrivedItems = queue.filter(q=>q.detailsArrived).sort((a,b)=> (a.createdAt||0)-(b.createdAt||0));
+
+      // Badge: only pending count
+      $('queueCount').textContent = pendingItems.length;
+      const _qb = $('tabQueueBadge'); if(_qb){ _qb.textContent = pendingItems.length; _qb.classList.toggle('hidden', pendingItems.length===0); }
+
+      // Inline customer chips (excludes arrived names per 3.1)
       const names = sortedCustomerNames(counts);
       const inlineBox = $('queueInlineCustomers');
       if(inlineBox) inlineBox.innerHTML = names.length ? names.map(n=> custChipHtml(n, counts)).join('') : '';
 
+      // Pending section
       const list = $('queueList');
-      if(!queue.length){
+      if(!pendingItems.length && !arrivedItems.length){
         $('queueEmpty').classList.remove('hidden');
         list.innerHTML = '';
-        return;
+      } else {
+        $('queueEmpty').classList.add('hidden');
+        list.innerHTML = pendingItems.map(queueJobCardHtml).join('');
+        if(pendingItems.length) wireQueueJobs(list);
       }
-      $('queueEmpty').classList.add('hidden');
-      list.innerHTML = sortedQueue().map(queueJobCardHtml).join('');
-      wireQueueJobs(list);
+
+      // Arrived archive section
+      const arrivedSection = $('queueArrivedSection');
+      const arrivedList = $('queueArrivedList');
+      const arrivedCount = $('queueArrivedCount');
+      if(arrivedSection && arrivedList){
+        if(arrivedItems.length){
+          arrivedSection.classList.remove('hidden');
+          if(arrivedCount) arrivedCount.textContent = arrivedItems.length;
+          arrivedList.innerHTML = arrivedItems.map(queueJobCardHtml).join('');
+          wireQueueJobs(arrivedList);
+        } else {
+          arrivedSection.classList.add('hidden');
+        }
+      }
     }
-    function sortedQueue(){ return queue.slice().sort((a,b)=> (a.detailsArrived?1:0)-(b.detailsArrived?1:0) || (a.createdAt||0)-(b.createdAt||0)); }
+    function sortedQueue(){ return queue.slice().sort((a,b)=> (a.createdAt||0)-(b.createdAt||0)); }
     function sortedCustomerNames(counts){ return Object.keys(counts).sort((a,b)=> counts[b].total-counts[a].total || a.localeCompare(b,'th')); }
     function custChipHtml(n, counts){
       const c = counts[n];
@@ -1905,9 +1978,12 @@
           const removed = queue.find(x=>x.id===btn.dataset.qRemove);
           if(!removed) return;
           try{
+            // Move to queueHistory instead of deleting permanently
+            const archived = { ...removed, archivedAt: Date.now() };
+            await queueHistoryColRef.doc(removed.id).set(archived);
             await queueColRef.doc(btn.dataset.qRemove).delete();
-            logHistory(`เอาออกจากคิว (รายละเอียดมาแล้ว) — ${removed.event}`);
-            showToast('เอางานออกจากคิวแล้ว ✓');
+            logHistory(`ย้ายเข้าประวัติคิว — ${removed.event}`);
+            showToast('ย้ายเข้าประวัติแล้ว ✓');
           }catch(e){
             showToast('ลบไม่สำเร็จ ลองใหม่อีกครั้ง');
           }
@@ -1960,6 +2036,69 @@
         btn.addEventListener('click', ()=>{ if(editingQueueClients.length<=1) return; editingQueueClients = editingQueueClients.filter(x=>x.id!==btn.dataset.clRemove); renderQueueClientRows(); });
       });
     }
+    function renderQueueHistory(){
+      const section = $('queueHistorySection');
+      const list = $('queueHistoryList');
+      const count = $('queueHistoryCount');
+      if(!section || !list) return;
+      if(!queueHistoryItems.length){ section.classList.add('hidden'); return; }
+      section.classList.remove('hidden');
+      if(count) count.textContent = queueHistoryItems.length;
+      list.innerHTML = queueHistoryItems.map(q=>{
+        const clients = (q.clients||[]).map(c=>escapeHtml(c.name||'')).filter(Boolean).join(', ');
+        const typeBadge = q.type==='กดบัตร'
+          ? '<span class="type-badge bid">กดบัตร</span>'
+          : '<span class="type-badge form">กรอกฟอร์ม</span>';
+        const dateStr = q.archivedAt ? new Date(q.archivedAt).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'}) : '';
+        return `<div class="qh-item">
+          <div class="qh-head">
+            ${typeBadge}
+            <span class="qh-event">${escapeHtml(q.event||'-')}</span>
+            <span class="qh-date">${dateStr}</span>
+            <button class="qh-restore-btn" data-qh-restore="${q.id}" title="ย้ายกลับเข้าคิว">↩ คืนคิว</button>
+            <button class="qh-delete-btn" data-qh-delete="${q.id}" title="ลบออกถาวร">🗑️</button>
+          </div>
+          <div class="qh-clients">👥 ${clients||'-'}</div>
+        </div>`;
+      }).join('');
+      // Wire buttons
+      list.querySelectorAll('[data-qh-restore]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const item = queueHistoryItems.find(q=>q.id===btn.dataset.qhRestore); if(!item) return;
+          try{
+            const { archivedAt, ...restored } = item;
+            await queueColRef.doc(item.id).set({ ...restored, detailsArrived: false });
+            await queueHistoryColRef.doc(item.id).delete();
+            logHistory(`คืนคิว — ${item.event}`);
+            showToast('ย้ายกลับเข้าคิวแล้ว ✓');
+          }catch(e){ showToast('เกิดข้อผิดพลาด ลองใหม่อีกครั้ง'); }
+        });
+      });
+      list.querySelectorAll('[data-qh-delete]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const item = queueHistoryItems.find(q=>q.id===btn.dataset.qhDelete); if(!item) return;
+          if(!confirm(`ลบ "${item.event}" ออกถาวรเลยไหม?`)) return;
+          try{
+            await queueHistoryColRef.doc(item.id).delete();
+            logHistory(`ลบประวัติคิว — ${item.event}`);
+            showToast('ลบออกแล้ว ✓');
+          }catch(e){ showToast('เกิดข้อผิดพลาด ลองใหม่อีกครั้ง'); }
+        });
+      });
+    }
+
+    function initQueueHistoryToggle(){
+      const btn = $('queueHistoryToggle');
+      const content = $('queueHistoryContent');
+      const arrow = $('queueHistoryArrow');
+      if(!btn) return;
+      btn.addEventListener('click', ()=>{
+        const open = content.style.display !== 'none';
+        content.style.display = open ? 'none' : '';
+        arrow.textContent = open ? '▼' : '▲';
+      });
+    }
+
     function openQueueModal(editId){
       const editing = editId ? queue.find(q=>q.id===editId) : null;
       if(editing){
@@ -1994,25 +2133,29 @@
       if(!event){ showToast('กรุณากรอกชื่องาน'); return; }
       const clients = editingQueueClients.map(c=>({name:(c.name||'').trim(), source:c.source})).filter(c=>c.name);
       if(!clients.length){ showToast('ใส่ชื่อลูกค้าอย่างน้อย 1 คน'); return; }
-      const counts = customerCounts();
-      const totalOf = (name)=> counts[name] ? counts[name].total : 0;
-      if(editingQueueId){
-        const cur = queue.find(q=>q.id===editingQueueId);
-        (cur ? cur.clients : []).forEach(c=>{ const k=(c.name||'').trim(); if(k && counts[k]) counts[k].total--; });
-      }
+      // Count queue bookings excluding the item currently being edited
+      const counts = {};
+      queue.forEach(q=>{
+        if(q.id === editingQueueId) return;
+        (q.clients||[]).forEach(c=>{
+          const k=(c.name||'').trim(); if(!k) return;
+          counts[k] = (counts[k]||0) + 1;
+        });
+      });
       for(const c of clients){
-        if(totalOf(c.name) + 1 > QUEUE_LIMIT){
-          showToast(`“${c.name}” จองครบ ${QUEUE_LIMIT} งานแล้ว เพิ่มไม่ได้`); return;
+        const k = (c.name||'').trim(); if(!k) continue;
+        if((counts[k]||0) + 1 > QUEUE_LIMIT){
+          showToast(`"${k}" จองครบ ${QUEUE_LIMIT} งานแล้ว เพิ่มไม่ได้`); return;
         }
-        if(!counts[c.name]) counts[c.name] = { total:0, bid:0, form:0 };
-        counts[c.name].total++;
+        counts[k] = (counts[k]||0) + 1;
       }
       if(editingQueueId){
-        const idx = queue.findIndex(q=>q.id===editingQueueId);
-        const updated = idx>-1 ? { ...queue[idx], event, type: qType, clients } : { id: editingQueueId, event, type: qType, clients, detailsArrived:false, createdAt: Date.now() };
+        const savedId = editingQueueId; // save before closeQueueModal nulls it
+        const idx = queue.findIndex(q=>q.id===savedId);
+        const updated = idx>-1 ? { ...queue[idx], event, type: qType, clients } : { id: savedId, event, type: qType, clients, detailsArrived:false, createdAt: Date.now() };
         closeQueueModal();
         try{
-          await queueColRef.doc(editingQueueId).set(updated);
+          await queueColRef.doc(savedId).set(updated);
           logHistory(`แก้ไขคิว — ${event} (${clients.map(c=>c.name).join(', ')})`);
           showToast('บันทึกการแก้ไขแล้ว ✓');
         }catch(e){
@@ -2162,22 +2305,23 @@
         table.innerHTML = '<div class="rec-empty">ยังไม่มีข้อมูลรายสัปดาห์</div>';
         return;
       }
-      table.innerHTML = `<table class="rec-table">
-        <thead><tr><th>สัปดาห์</th><th class="hide-sm">งาน</th><th>ยอดรวม</th><th>สถานะ</th><th></th></tr></thead>
-        <tbody>
-          ${weeks.map(w=>`<tr class="${w.settled?'':'unsettled'}">
-            <td>${weekRangeLabel(w.sun)}</td>
-            <td class="hide-sm">${w.count}</td>
-            <td class="rec-amt">${baht(w.total)}</td>
-            <td><span class="rec-pill ${w.settled?'settled':'pending'}">${w.settled?'โอนแล้ว':'ยังค้าง'}</span></td>
-            <td><button type="button" class="rec-pdf-btn" data-week-report="${w.sun}" title="ดูสรุปละเอียด / ดาวน์โหลด PDF">📄 PDF</button></td>
-          </tr>`).join('')}
-        </tbody>
-        <tfoot><tr class="rec-foot">
-          <td>รวมยังไม่โอน</td><td class="hide-sm"></td>
-          <td class="rec-amt" style="color:var(--red-deep)">${baht(unsettledTotal)}</td><td></td><td></td>
-        </tr></tfoot>
-      </table>`;
+      table.innerHTML =
+        weeks.map(w=>`
+          <div class="rec-row ${w.settled?'settled':'unsettled'}">
+            <div class="rec-row-top">
+              <span class="rec-row-week">${weekRangeLabel(w.sun)}</span>
+              <button type="button" class="rec-pdf-btn" data-week-report="${w.sun}">📄 PDF</button>
+            </div>
+            <div class="rec-row-info">
+              <span class="rec-row-count">${w.count} งาน</span>
+              <span class="rec-amt">${baht(w.total)}</span>
+              <span class="rec-pill ${w.settled?'settled':'pending'}">${w.settled?'โอนแล้ว':'ยังค้าง'}</span>
+            </div>
+          </div>`).join('') +
+        `<div class="rec-row rec-foot-row">
+          <span class="rec-row-week">รวมยังไม่โอน</span>
+          <span class="rec-amt" style="color:var(--red-deep)">${baht(unsettledTotal)}</span>
+        </div>`;
       table.querySelectorAll('[data-week-report]').forEach(btn=> btn.addEventListener('click', ()=> openWeekReport(btn.dataset.weekReport)));
     }
     function copyReconcile(){
@@ -3418,7 +3562,7 @@
     const TAB_SECTIONS = {
       main:     ['#confirmDue','#todayBanner','#formPending','#settleCheck','.ticket-hero','#weekStrip','.toolbar','.table-card','#historyPanel'],
       calendar: ['#weekStrip','.calendar-card'],
-      queue:    ['#queueCard'],
+      queue:    ['#queueCard','#queueArrivedSection','#queueHistorySection'],
       money:    ['.ticket-hero','#weekStrip','#cashCard','.chips','#reconcileCard']
     };
     const ALL_TAB_SELS = Object.values(TAB_SECTIONS).flat();
@@ -3444,6 +3588,7 @@
     (async ()=>{
       startRealtimeSync();
       startPresence();
+      initQueueHistoryToggle();
     })();
 })();
 </script>
